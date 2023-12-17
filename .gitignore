@@ -1,0 +1,11 @@
+/node_modules/
+/lib/
+/test/
+custom-elements.json
+# top level source
+mg-blog.js
+mg-blog.js.map
+mg-blog.d.ts
+mg-blog.d.ts.map
+# only generated for size check
+mg-blog.bundled.js

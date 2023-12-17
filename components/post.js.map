@@ -1,0 +1,1 @@
+{"version":3,"file":"post.js","sourceRoot":"","sources":["../src/components/post.ts"],"names":[],"mappings":"","sourcesContent":["export interface Post {\r\n  title: string;\r\n  userId: number;\r\n  body: string;\r\n  name?: string;\r\n  id: number;\r\n}\r\n"]}
