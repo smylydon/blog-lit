@@ -25,7 +25,7 @@
     "analyze:watch": "cem analyze --litelement --globs \"src/**/*.ts\" --watch",
     "serve": "wds --watch",
     "serve:prod": "MODE=prod npm run serve",
-    "start": "npm run build:watch && npm run serve",
+    "start": "concurrently \"npm run build:watch\" \"npm run serve\"",
     "test": "npm run test:dev && npm run test:prod",
     "test:dev": "wtr",
     "test:watch": "wtr --watch",
@@ -42,6 +42,7 @@
   "author": "Google LLC",
   "license": "BSD-3-Clause",
   "dependencies": {
+    "concurrently": "^8.2.2",
     "lit": "^2.2.4"
   },
   "devDependencies": {
