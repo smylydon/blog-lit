@@ -122,9 +122,9 @@ export class MgLayout extends LitElement {
   route = 'home';
 
   override render() {
-    let route = html`<mg-home slot="slot1" />`;
+    let route = html`<mg-home />`;
     if (/post/i.test(this.route)) {
-      route = html`<mg-post slot="slot1" />`;
+      route = html`<mg-post />`;
     }
     return html`
       <header class="header">
@@ -140,7 +140,7 @@ export class MgLayout extends LitElement {
           </ul>
         </nav>
       </header>
-      <main class="App"><slot name="slot1"></slot> ${route}</main>
+      <main>${route}</main>
     `;
   }
 

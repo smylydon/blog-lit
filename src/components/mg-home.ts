@@ -5,8 +5,8 @@ import {Post} from './post';
 import {posts} from './data';
 
 /**
- * An example element.
- *
+ * Home element.
+ * display a list of posts.
  */
 @customElement('mg-home')
 export class MgHome extends LitElement {
@@ -15,7 +15,8 @@ export class MgHome extends LitElement {
 
   override render() {
     const view = this.posts.map((post: Post) => {
-      return html`<mg-post issingle="true" post=${JSON.stringify(post)} />`;
+      const value = JSON.stringify(post);
+      return html`<mg-post issingle="true" post=${value} />`;
     });
     return html`${view}`;
   }

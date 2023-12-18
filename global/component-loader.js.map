@@ -1,1 +1,0 @@
-{"version":3,"file":"component-loader.js","sourceRoot":"","sources":["../src/global/component-loader.ts"],"names":[],"mappings":"AAAA,cAAc,yBAAyB,CAAC;AACxC,cAAc,uBAAuB,CAAC;AACtC,cAAc,uBAAuB,CAAC","sourcesContent":["export * from '../components/mg-layout';\r\nexport * from '../components/mg-home';\r\nexport * from '../components/mg-post';\r\n"]}

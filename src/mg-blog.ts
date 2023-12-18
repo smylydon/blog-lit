@@ -23,21 +23,10 @@ export class MgBlog extends LitElement {
       padding: 0;
       box-sizing: border-box;
     }
-
-    html {
-      font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
-      background-color: white;
-      color: #000;
-    }
-
-    body {
-      min-height: 100vh;
-      font-size: 1.5rem;
-    }
   `;
 
   override render() {
-    return html` <mg-layout></mg-layout> `;
+    return html`<mg-layout></mg-layout>`;
   }
 }
 
