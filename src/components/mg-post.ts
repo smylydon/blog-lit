@@ -31,7 +31,7 @@ export class MgPost extends LitElement {
 
   override render() {
     const post = this.model;
-    let value = html`<a @click=${this._onClickNew}>View Post</a>`;
+    let value = html`<a @click=${this._onClickView}>View Post</a>`;
 
     if (this.isSingle) {
       value = html`<a @click=${this._onClickEdit}>Edit Post</a>`;
@@ -42,20 +42,33 @@ export class MgPost extends LitElement {
       <p class="post-credit">
         ${value}
         <span>${post.name}</span>
+        <mg-time-ago timestamp="${post.date}"></mg-time-ago>
       </p>
     </article> `;
   }
 
   private _onClickEdit(event: Event) {
     event.preventDefault();
-    console.log('edit-post');
-    this.dispatchEvent(new CustomEvent('edit-post'));
+    console.log('go edit post');
+    this.dispatchEvent(
+      new CustomEvent('editPost', {
+        detail: {
+          id: this.model.id,
+        },
+      })
+    );
   }
 
-  private _onClickNew(event: Event) {
+  private _onClickView(event: Event) {
     event.preventDefault();
-    console.log('new-post');
-    this.dispatchEvent(new CustomEvent('new-post'));
+    console.log('go view post');
+    this.dispatchEvent(
+      new CustomEvent('viewPost', {
+        detail: {
+          id: this.model.id,
+        },
+      })
+    );
   }
 }
 

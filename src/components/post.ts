@@ -4,4 +4,5 @@ export interface Post {
   body: string;
   name?: string;
   id: number;
+  date?: string;
 }

@@ -7,7 +7,8 @@
   "module": "mg-blog.js",
   "type": "module",
   "scripts": {
-    "build": "rollup --config rollup.config.js",
+    "build": "npm run clean && rollup --config rollup.config.js",
+    "build:prod": "npm run clean && rollup --config rollup.config.prod.js",
     "build:watch": "npm run build --watch",
     "clean": "rimraf dist",
     "lint": "npm run lint:lit-analyzer && npm run lint:eslint",
@@ -25,7 +26,7 @@
     "analyze:watch": "cem analyze --litelement --globs \"src/**/*.ts\" --watch",
     "serve": "wds --watch",
     "serve:prod": "MODE=prod npm run serve",
-    "start": "npm run clean && concurrently \"npm run build:watch\" \"npm run serve\"",
+    "start": "concurrently \"npm run build:watch\" \"npm run serve\"",
     "test": "npm run test:dev && npm run test:prod",
     "test:dev": "wtr",
     "test:watch": "wtr --watch",
@@ -44,7 +45,8 @@
   "dependencies": {
     "concurrently": "^8.2.2",
     "lit": "^2.2.4",
-    "tslib": "^2.4.0"
+    "tslib": "^2.4.0",
+    "date-fns": "^2.29.3"
   },
   "devDependencies": {
     "@11ty/eleventy": "^2.0.1",
