@@ -1,7 +1,8 @@
 //import "./index.scss";
-import {LitElement, html, css} from 'lit';
+import {LitElement, html} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import {Post} from './post';
+import styles from './mg-post.scss';
 
 /**
  * A blog element.
@@ -9,30 +10,7 @@ import {Post} from './post';
  */
 @customElement('mg-post')
 export class MgPost extends LitElement {
-  static override styles = css`
-    .post-credit {
-      font-size: 1rem;
-    }
-
-    a {
-      cursor: pointer;
-    }
-
-    .post-credit a,
-    .post-credit a:visited {
-      margin-right: 0.5rem;
-      color: black;
-    }
-
-    .post-credit a:hover,
-    .post-credit a:focus {
-      color: hsla(0, 0%, 0%, 0.75);
-    }
-
-    .excerpt {
-      font-style: italic;
-    }
-  `;
+  static override styles = styles;
 
   @property({attribute: 'post'})
   set setPost(post: string) {
