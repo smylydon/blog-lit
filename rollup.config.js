@@ -9,11 +9,22 @@ import {terser} from 'rollup-plugin-terser';
 import resolve from '@rollup/plugin-node-resolve';
 import replace from '@rollup/plugin-replace';
 import copy from 'rollup-plugin-copy';
+import typescript from '@rollup/plugin-typescript';
+
+const TARGETS = [
+  {src: 'src/index.html', dest: 'dist'},
+  {src: 'src/index.css', dest: 'dist'},
+  {
+    src: '../node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js',
+    dest: 'dist',
+  },
+  {src: '../node_modules/lit/polyfill-support.js', dest: 'dist'},
+];
 
 export default {
-  input: 'mg-blog.js',
+  input: 'src/index.ts',
   output: {
-    file: 'mg-blog.bundled.js',
+    dir: 'dist',
     format: 'esm',
     sourcemap: true,
   },
@@ -25,6 +36,7 @@ export default {
   plugins: [
     replace({'Reflect.decorate': 'undefined'}),
     resolve(),
+    typescript(),
     terser({
       ecma: 2017,
       module: true,
@@ -36,10 +48,7 @@ export default {
       },
     }),
     copy({
-      targets: [
-        {src: 'src/index.html', dest: 'dist'},
-        {src: 'src/index.css', dest: 'dist'},
-      ],
+      targets: TARGETS,
     }),
     summary(),
   ],
