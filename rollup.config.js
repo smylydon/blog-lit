@@ -5,11 +5,13 @@
  */
 
 import summary from 'rollup-plugin-summary';
-import {terser} from 'rollup-plugin-terser';
+import terser from '@rollup/plugin-terser';
 import resolve from '@rollup/plugin-node-resolve';
 import replace from '@rollup/plugin-replace';
 import copy from 'rollup-plugin-copy';
 import typescript from '@rollup/plugin-typescript';
+import postcss from 'rollup-plugin-postcss';
+import litcss from 'rollup-plugin-postcss-lit';
 
 const TARGETS = [
   {src: 'src/index.html', dest: 'dist'},
@@ -34,9 +36,14 @@ export default {
     }
   },
   plugins: [
-    replace({'Reflect.decorate': 'undefined'}),
+    replace({'Reflect.decorate': 'undefined', preventAssignment: true}),
     resolve(),
     typescript(),
+    postcss({
+      minimize: false,
+      inject: false,
+    }),
+    litcss(),
     terser({
       ecma: 2017,
       module: true,
