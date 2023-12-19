@@ -14,17 +14,52 @@ import styles from './mg-layout.scss';
 @customElement('mg-layout')
 export class MgLayout extends LitElement {
   static override styles = styles;
-  /**
-   * The number of times the button has been clicked.
-   */
+
   @property({attribute: false})
   route = 'home';
 
+  @property()
+  view = 'list-post';
+
+  @property()
+  postId: string | undefined;
+
+  constructor() {
+    super();
+    this.addEventListener('view-post', this.changeView);
+    this.addEventListener('edit-post', this.changeView);
+  }
+
+  disconnectedCallback() {
+    this.removeEventListener('view-post', this.changeView);
+    this.removeEventListener('edit-post', this.changeView);
+    super.disconnectedCallback();
+  }
+
+  changeView(event: CustomEvent) {
+    event.stopImmediatePropagation();
+    const id = event.detail.id;
+    const type = event.type;
+    this.view = type;
+    this.postId = id;
+  }
+
+  private _onClickHome(event: Event) {
+    event.preventDefault();
+    this.route = 'home';
+    this.view = 'list-post';
+  }
+
+  private _onClickPost(event: Event) {
+    event.preventDefault();
+    this.route = 'post';
+  }
+
   override render() {
-    let route = html`<mg-home />`;
-    if (/post/i.test(this.route)) {
-      route = html`<mg-post />`;
-    }
+    const output = /post/i.test(this.route)
+      ? html`<mg-post />`
+      : html`<mg-home view="${this.view}" postId="${this.postId}" />`;
+
     return html`
       <header class="header">
         <h1>Redux Blog</h1>
@@ -39,20 +74,8 @@ export class MgLayout extends LitElement {
           </ul>
         </nav>
       </header>
-      <main>${route}</main>
+      <main>${output}</main>
     `;
-  }
-
-  private _onClickHome(event: Event) {
-    event.preventDefault();
-    this.route = 'home';
-    this.dispatchEvent(new CustomEvent('route-home'));
-  }
-
-  private _onClickPost(event: Event) {
-    event.preventDefault();
-    this.route = 'post';
-    this.dispatchEvent(new CustomEvent('route-post'));
   }
 }
 

@@ -1,6 +1,6 @@
 //import "./index.scss";
 import {LitElement, html} from 'lit';
-import {customElement, state} from 'lit/decorators.js';
+import {customElement, property, state} from 'lit/decorators.js';
 import {Post} from './post';
 import {posts} from './data';
 import styles from './mg-home.scss';
@@ -13,23 +13,11 @@ import styles from './mg-home.scss';
 export class MgHome extends LitElement {
   static override styles = styles;
 
-  connectedCallback() {
-    super.connectedCallback();
-    console.log('addEventListeners');
-    window.addEventListener('viewPost', this.changeView);
-    window.addEventListener('editPost', this.changeView);
-  }
-
-  disconnectedCallback() {
-    console.log('removeEventListener');
-
-    window.removeEventListener('viewPost', this.changeView);
-    window.removeEventListener('editPost', this.changeView);
-    super.disconnectedCallback();
-  }
-
-  @state()
+  @property()
   view = 'list-post';
+
+  @property()
+  postId: string | undefined;
 
   @state()
   posts: Post[] = posts.map((post) => {
@@ -37,35 +25,28 @@ export class MgHome extends LitElement {
     return post;
   }) as Post[];
 
-  changeView(event: CustomEvent) {
-    console.log('changeView');
-    event.stopImmediatePropagation();
-    const id = event.detail.id;
-    const type = event.type;
-    this.view = type;
-
-    this.render();
-  }
-
-  override render(id = undefined) {
+  override render() {
     const isSinglePost = ['view-post', 'edit-post'].includes(this.view);
-    let view;
+    const id = Number(this.postId);
+    const postId = isFinite(id) ? id : undefined;
+
+    let output;
     if (isSinglePost) {
-      const post = posts.find((post) => post.id === id);
+      const post = posts.find((post) => post.id === postId);
       const value = post ? JSON.stringify(post) : JSON.stringify({});
       if (this.view === 'view-post') {
-        view = html`<mg-post issingle="true" post=${value} />`;
+        output = html`<mg-post issingle="true" post=${value} />`;
       } else if (this.view === 'edit-post') {
         // will add new component
-        view = html`<mg-post issingle="true" post=${value} />`;
+        output = html`<mg-post issingle="true" post=${value} />`;
       }
     } else {
-      view = this.posts.map((post: Post) => {
+      output = this.posts.map((post: Post) => {
         const value = JSON.stringify(post);
         return html`<mg-post issingle="false" post=${value} />`;
       });
     }
-    return html`${view}`;
+    return html`${output}`;
   }
 }
 

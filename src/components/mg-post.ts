@@ -49,24 +49,28 @@ export class MgPost extends LitElement {
 
   private _onClickEdit(event: Event) {
     event.preventDefault();
-    console.log('go edit post');
+
     this.dispatchEvent(
-      new CustomEvent('editPost', {
+      new CustomEvent('edit-post', {
         detail: {
           id: this.model.id,
         },
+        bubbles: true,
+        composed: true,
       })
     );
   }
 
   private _onClickView(event: Event) {
     event.preventDefault();
-    console.log('go view post');
+
     this.dispatchEvent(
-      new CustomEvent('viewPost', {
+      new CustomEvent('view-post', {
         detail: {
           id: this.model.id,
         },
+        bubbles: true,
+        composed: true,
       })
     );
   }
