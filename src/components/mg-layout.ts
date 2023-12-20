@@ -1,10 +1,7 @@
-/**
- * @license
- * Copyright 2019 Google LLC
- * SPDX-License-Identifier: BSD-3-Clause
- */
 import {LitElement, html} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
+import {when} from 'lit/directives/when.js';
+
 import styles from './mg-layout.scss';
 
 /**
@@ -56,9 +53,11 @@ export class MgLayout extends LitElement {
   }
 
   override render() {
-    const output = /post/i.test(this.route)
-      ? html`<mg-post />`
-      : html`<mg-home view="${this.view}" postId="${this.postId}" />`;
+    const output = when(
+      this.route === 'post',
+      () => html`<mg-post />`,
+      () => html`<mg-home view="${this.view}" postId="${this.postId}" />`
+    );
 
     return html`
       <header class="header">

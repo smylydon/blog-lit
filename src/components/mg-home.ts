@@ -1,4 +1,3 @@
-//import "./index.scss";
 import {LitElement, html} from 'lit';
 import {customElement, property, state} from 'lit/decorators.js';
 import {Post} from './post';
@@ -35,15 +34,15 @@ export class MgHome extends LitElement {
       const post = posts.find((post) => post.id === postId);
       const value = post ? JSON.stringify(post) : JSON.stringify({});
       if (this.view === 'view-post') {
-        output = html`<mg-post issingle="true" post=${value} />`;
+        output = html`<mg-post issingle post=${value} />`;
       } else if (this.view === 'edit-post') {
         // will add new component
-        output = html`<mg-post issingle="true" post=${value} />`;
+        output = html`<mg-post issingle post=${value} />`;
       }
     } else {
       output = this.posts.map((post: Post) => {
         const value = JSON.stringify(post);
-        return html`<mg-post issingle="false" post=${value} />`;
+        return html`<mg-post post=${value} />`;
       });
     }
     return html`${output}`;
