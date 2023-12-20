@@ -16,10 +16,10 @@ const TARGETS = [
   {src: 'src/index.html', dest: 'dist'},
   {src: 'src/index.css', dest: 'dist'},
   {
-    src: '../node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js',
-    dest: 'dist',
+    src: './node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js',
+    dest: 'dist/lib',
   },
-  {src: '../node_modules/lit/polyfill-support.js', dest: 'dist'},
+  {src: './node_modules/lit/polyfill-support.js', dest: 'dist/lib'},
 ];
 
 export default {
@@ -39,7 +39,7 @@ export default {
     resolve(),
     typescript(),
     postcss({
-      minimize: false,
+      minimize: true,
       inject: false,
     }),
     litcss(),
