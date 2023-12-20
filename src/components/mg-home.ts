@@ -1,7 +1,7 @@
 import {LitElement, html} from 'lit';
 import {customElement, property, state} from 'lit/decorators.js';
-import {Post} from './post';
-import {posts} from './data';
+import {Post} from '../global/post';
+import {posts} from '../global/data';
 import styles from './mg-home.scss';
 
 /**
@@ -19,10 +19,7 @@ export class MgHome extends LitElement {
   postId: string | undefined;
 
   @state()
-  posts: Post[] = posts.map((post) => {
-    post.date = new Date().toISOString();
-    return post;
-  }) as Post[];
+  posts: Post[] = posts;
 
   override render() {
     const isSinglePost = ['view-post', 'edit-post'].includes(this.view);

@@ -2,7 +2,7 @@ import {LitElement, html} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import {when} from 'lit/directives/when.js';
 
-import {Post} from './post';
+import {Post} from '../global/post';
 import styles from './mg-post.scss';
 
 @customElement('mg-post')
@@ -33,7 +33,14 @@ export class MgPost extends LitElement {
       () => html`<a @click=${this._onClickEdit}>Edit Post</a>`,
       () => html`<a @click=${this._onClickView}>View Post</a>`
     );
-
+    const reactions = when(
+      post.reactions,
+      () =>
+        html`<mg-reaction-buttons
+          post=${JSON.stringify(post)}
+        ></mg-reaction-buttons>`,
+      () => html`<mg-reaction-buttons></mg-reaction-buttons>`
+    );
     return html`<article>
       <h2>${post.title}</h2>
       <p class="excerpt">${post.body}...</p>
@@ -42,6 +49,7 @@ export class MgPost extends LitElement {
         <span>${post.name}</span>
         <mg-time-ago timestamp="${post.date}"></mg-time-ago>
       </p>
+      ${reactions}
     </article> `;
   }
 

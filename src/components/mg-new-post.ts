@@ -1,6 +1,6 @@
 import {LitElement, html} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
-import {Post} from './post';
+import {Post} from '../global/post';
 
 @customElement('mg-new-post')
 export class MgNewPost extends LitElement {

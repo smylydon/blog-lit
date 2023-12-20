@@ -1,6 +1,6 @@
 import {Post} from './post';
 
-export const posts: Post[] = [
+const data: Post[] = [
   {
     userId: 1,
     id: 1,
@@ -610,3 +610,15 @@ export const posts: Post[] = [
     body: 'cupiditate quo est a modi nesciunt soluta\nipsa voluptas error itaque dicta in\nautem qui minus magnam et distinctio eum\naccusamus ratione error aut',
   },
 ];
+
+export const posts: Post[] = data.map((post) => {
+  post.date = new Date().toISOString();
+  post.reactions = {
+    thumbsUp: 0,
+    wow: 0,
+    heart: 0,
+    rocket: 0,
+    coffee: 0,
+  };
+  return post;
+}) as Post[];
