@@ -13,5 +13,7 @@ export * from './components/mg-time-ago';
 
 export * from './components/form/mg-form';
 export * from './components/form/mg-input';
+export * from './components/form/mg-selector';
+export * from './components/form/mg-textarea';
 
 export * from './global/time-ago';

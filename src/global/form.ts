@@ -21,7 +21,7 @@ export interface FormItem {
   type: string;
   name: string;
   value: number | string | boolean;
-  validator: Validator | Validator[];
+  validator?: ExistsValidator | LengthValidator;
 }
 
 export interface Form {
