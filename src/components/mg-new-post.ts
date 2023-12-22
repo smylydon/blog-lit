@@ -14,7 +14,13 @@ export class MgNewPost extends LitElement {
   } as Post;
 
   override render() {
-    return html` <span> &nbsp; <i></i> </span> `;
+    return html`
+      <span>
+        <mg-form
+          ><mg-input value="3" label="testing"></mg-input
+          ><mg-input value="3ddd" label="hahaha"></mg-input> </mg-form
+      ></span>
+    `;
   }
 }
 

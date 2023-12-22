@@ -55,7 +55,7 @@ export class MgLayout extends LitElement {
   override render() {
     const output = when(
       this.route === 'post',
-      () => html`<mg-post />`,
+      () => html`<mg-new-post />`,
       () => html`<mg-home view="${this.view}" postId="${this.postId}" />`
     );
 
