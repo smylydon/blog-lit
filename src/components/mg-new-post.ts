@@ -21,7 +21,7 @@ export class MgNewPost extends LitElement {
     name: 'postTitle',
     value: '',
     validator: {
-      valid: false,
+      valid: true,
       type: ValidatorType.length,
       length: 3,
     },
@@ -33,7 +33,7 @@ export class MgNewPost extends LitElement {
     name: 'postContent',
     value: '',
     validator: {
-      valid: false,
+      valid: true,
       type: ValidatorType.length,
       length: 3,
     },
@@ -45,7 +45,7 @@ export class MgNewPost extends LitElement {
     name: 'postAuthor',
     value: 0,
     validator: {
-      valid: false,
+      valid: true,
       type: ValidatorType.exists,
     },
   };
@@ -53,7 +53,7 @@ export class MgNewPost extends LitElement {
   @state()
   form: Form = {
     name: 'editForm',
-    valid: false,
+    valid: true,
     formItems: [this.postAuthor, this.postContent, this.postTitle],
   };
 

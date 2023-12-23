@@ -1,3 +1,7 @@
+export enum FormItemEvent {
+  updated = 'formitem:updated',
+}
+
 export enum ValidatorType {
   exists = 'exists',
   length = 'length',

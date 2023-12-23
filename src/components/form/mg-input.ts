@@ -2,15 +2,15 @@ import {LitElement, html} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import {when} from 'lit/directives/when.js';
 
-import {FormItem} from '../../global/form';
+import {FormItem, FormItemEvent, ValidatorType} from '../../global/form';
 import styles from './mg-form.scss';
 
 @customElement('mg-input')
 export class MgInput extends LitElement {
   static override styles = styles;
 
-  @property({attribute: 'model'})
-  set setPost(formItem: string) {
+  @property({attribute: 'validator'})
+  set setInput(formItem: string) {
     this.formItem = JSON.parse(formItem);
   }
 
@@ -27,16 +27,53 @@ export class MgInput extends LitElement {
   @property()
   label = '';
 
+  @property()
+  disable = false;
+
+  updated() {
+    if (this.formItem && this.formItem.validator) {
+      const validator = this.formItem.validator;
+      const value = this.value.trim();
+      if (validator.type === ValidatorType.length) {
+        validator.valid = value.length >= validator.length;
+      } else {
+        validator.valid = value.length > 0;
+      }
+    }
+    this.dispatchEvent(
+      new CustomEvent(FormItemEvent.updated, {
+        detail: {
+          name: this.formItem.name,
+          formItem: this.formItem,
+        },
+        bubbles: true,
+        composed: true,
+      })
+    );
+  }
+
+  _onInput(e: KeyboardEvent) {
+    e.stopImmediatePropagation();
+    this.value = (e.target as HTMLInputElement).value;
+  }
+
   override render() {
-    const output = when(
+    const output1 = when(
       this.label.length > 0,
       () => html`<label htmlFor="input">${this.label}</label>`,
       () => html``
     );
-    return html`
-      ${output}
-      <input name="input" value=${this.value} />
-    `;
+    const output2 = when(
+      this.disable,
+      () => html` <input name="input" value=${this.value} disabled />`,
+      () =>
+        html` <input
+          name="input"
+          value=${this.value}
+          @input=${this._onInput}
+        />`
+    );
+    return html` ${output1} ${output2} `;
   }
 }
 
