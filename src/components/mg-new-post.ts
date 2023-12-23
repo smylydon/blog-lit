@@ -85,6 +85,7 @@ export class MgNewPost extends LitElement {
           <mg-textarea
             label="Content:"
             name="postContent"
+            value=""
             validator=${postContent}
           >
           </mg-textarea>

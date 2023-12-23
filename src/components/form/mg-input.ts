@@ -1,56 +1,12 @@
 import {LitElement, html} from 'lit';
-import {customElement, property} from 'lit/decorators.js';
+import {customElement} from 'lit/decorators.js';
 import {when} from 'lit/directives/when.js';
-
-import {FormItem, FormItemEvent, ValidatorType} from '../../global/form';
+import {FormItemBase} from './mg-form-item';
 import styles from './mg-form.scss';
 
 @customElement('mg-input')
-export class MgInput extends LitElement {
+export class MgInput extends FormItemBase(LitElement) {
   static override styles = styles;
-
-  @property({attribute: 'validator'})
-  set setInput(formItem: string) {
-    this.formItem = JSON.parse(formItem);
-  }
-
-  @property({attribute: false})
-  formItem: FormItem = {
-    type: '',
-    name: '',
-    value: '',
-  };
-
-  @property()
-  value = '';
-
-  @property()
-  label = '';
-
-  @property()
-  disable = false;
-
-  updated() {
-    if (this.formItem && this.formItem.validator) {
-      const validator = this.formItem.validator;
-      const value = this.value.trim();
-      if (validator.type === ValidatorType.length) {
-        validator.valid = value.length >= validator.length;
-      } else {
-        validator.valid = value.length > 0;
-      }
-    }
-    this.dispatchEvent(
-      new CustomEvent(FormItemEvent.updated, {
-        detail: {
-          name: this.formItem.name,
-          formItem: this.formItem,
-        },
-        bubbles: true,
-        composed: true,
-      })
-    );
-  }
 
   _onInput(e: KeyboardEvent) {
     e.stopImmediatePropagation();

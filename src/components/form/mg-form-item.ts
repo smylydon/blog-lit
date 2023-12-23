@@ -2,7 +2,18 @@ import {LitElement} from 'lit';
 import {property} from 'lit/decorators.js';
 import {FormItem, FormItemEvent, ValidatorType} from '../../global/form';
 
+/* eslint-disable  @typescript-eslint/no-explicit-any */
 type Constructor<T> = new (...args: any[]) => T;
+/* eslint-enable  @typescript-eslint/no-explicit-any */
+
+export declare class FormItemBaseInterface {
+  set setInput(formItem: string);
+  formItem: FormItem;
+  value: string;
+  label: string;
+  disable: boolean;
+  // protected update(content: unknown): void;
+}
 
 export const FormItemBase = <T extends Constructor<LitElement>>(
   superClass: T
@@ -29,7 +40,8 @@ export const FormItemBase = <T extends Constructor<LitElement>>(
     @property()
     disable = false;
 
-    updated() {
+    override updated() {
+      console.log('updated::', this.formItem.name);
       if (this.formItem && this.formItem.validator) {
         const validator = this.formItem.validator;
         const value = this.value.trim();
@@ -52,5 +64,5 @@ export const FormItemBase = <T extends Constructor<LitElement>>(
     }
   }
 
-  return FormItemElement as T;
+  return FormItemElement as Constructor<FormItemBaseInterface> & T;
 };
