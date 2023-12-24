@@ -12,7 +12,6 @@ export declare class FormItemBaseInterface {
   value: string;
   label: string;
   disable: boolean;
-  // protected update(content: unknown): void;
 }
 
 export const FormItemBase = <T extends Constructor<LitElement>>(
@@ -38,10 +37,9 @@ export const FormItemBase = <T extends Constructor<LitElement>>(
     label = '';
 
     @property()
-    disable = false;
+    disable;
 
     override updated() {
-      console.log('updated::', this.formItem.name);
       if (this.formItem && this.formItem.validator) {
         const validator = this.formItem.validator;
         const value = this.value.trim();

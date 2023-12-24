@@ -1,6 +1,6 @@
 import {LitElement, html} from 'lit';
 import {customElement, property, state} from 'lit/decorators.js';
-import {Form, FormItem, FormItemEvent} from '../../global/form';
+import {Form, FormEvent, FormItem, FormItemEvent} from '../../global/form';
 import styles from './mg-form.scss';
 
 @customElement('mg-form')
@@ -66,6 +66,16 @@ export class MgForm extends LitElement {
         });
       }
     }
+    this.dispatchEvent(
+      new CustomEvent(FormEvent.updated, {
+        detail: {
+          name: this.form.name,
+          form: this.form,
+        },
+        bubbles: true,
+        composed: true,
+      })
+    );
   }
 
   handleSlotchange(event) {

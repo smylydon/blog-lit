@@ -3,30 +3,12 @@ import {customElement, property} from 'lit/decorators.js';
 import {repeat} from 'lit/directives/repeat.js';
 import {when} from 'lit/directives/when.js';
 
-import {FormItem} from '../../global/form';
+import {FormItemBase} from './mg-form-item';
 import styles from './mg-form.scss';
 
 @customElement('mg-selector')
-export class MgSelector extends LitElement {
+export class MgSelector extends FormItemBase(LitElement) {
   static override styles = styles;
-
-  @property({attribute: 'model'})
-  set setPost(formItem: string) {
-    this.formItem = JSON.parse(formItem);
-  }
-
-  @property({attribute: false})
-  formItem: FormItem = {
-    type: '',
-    name: '',
-    value: '',
-  };
-
-  @property()
-  value = '';
-
-  @property()
-  label = '';
 
   @property({attribute: 'items'})
   set setItems(items: string) {
@@ -36,23 +18,46 @@ export class MgSelector extends LitElement {
   @property({attribute: false})
   items = [];
 
+  @property()
+  initialItem = '';
+
+  _onSelected(e: Event) {
+    e.stopImmediatePropagation();
+    this.value = (e.target as HTMLSelectElement).value;
+  }
+
   override render() {
-    const output = when(
+    const output1 = when(
       this.label.length > 0,
       () => html`<label htmlFor="selector">${this.label}</label>`,
       () => html``
     );
-    return html`
-      ${output}
-      <select name="selector">
+
+    const choices = repeat(
+      this.items,
+      (item) => item.id,
+      (item, index) => {
+        if (String(item.id) === this.initialItem) {
+          return html` <option value=${index} selected>${item.item}</option> `;
+        } else {
+          return html` <option value=${index}>${item.item}</option> `;
+        }
+      }
+    );
+
+    const output2 = when(
+      this.disable,
+      () => html`<select name="selector" disabled>
         <option value=""></option>
-        ${repeat(
-          this.items,
-          (item) => item.id,
-          (item, index) => html` <option value=${index}>${item.item}</option> `
-        )}
-      </select>
-    `;
+        ${choices}
+      </select>`,
+      () => html`<select name="selector" @change=${this._onSelected}>
+        <option value=""></option>
+        ${choices}
+      </select>`
+    );
+
+    return html` ${output1} ${output2} `;
   }
 }
 

@@ -2,7 +2,7 @@ import {LitElement, html} from 'lit';
 import {customElement, property, state} from 'lit/decorators.js';
 import {Post} from '../global/post';
 import {items} from '../global/users';
-import {Form, FormItem, ValidatorType} from '../global/form';
+import {Form, FormEvent, FormItem, ValidatorType} from '../global/form';
 
 @customElement('mg-new-post')
 export class MgNewPost extends LitElement {
@@ -57,6 +57,19 @@ export class MgNewPost extends LitElement {
     formItems: [this.postAuthor, this.postContent, this.postTitle],
   };
 
+  firstUpdated() {
+    this.addEventListener(FormEvent.updated, this.formUpdated);
+  }
+
+  disconnectedCallback() {
+    this.removeEventListener(FormEvent.updated, this.formUpdated);
+    super.disconnectedCallback();
+  }
+
+  formUpdated(e: CustomEvent) {
+    console.log('formUpdate:::', e.detail);
+  }
+
   override render() {
     const form = JSON.stringify(this.form);
     const postAuthor = JSON.stringify(this.postAuthor);
@@ -77,7 +90,7 @@ export class MgNewPost extends LitElement {
           <mg-selector
             name="postAuthor"
             items=${values}
-            initialIid="0"
+            initialItem=""
             label="Author:"
             validator=${postAuthor}
           >

@@ -1,5 +1,9 @@
+export enum FormEvent {
+  updated = 'mg-form:updated',
+}
+
 export enum FormItemEvent {
-  updated = 'formitem:updated',
+  updated = 'mg-formitem:updated',
 }
 
 export enum ValidatorType {
