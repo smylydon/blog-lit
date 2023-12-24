@@ -41,13 +41,16 @@ export const FormItemBase = <T extends Constructor<LitElement>>(
 
     override updated() {
       if (this.formItem && this.formItem.validator) {
-        const validator = this.formItem.validator;
-        const value = this.value.trim();
-        if (validator.type === ValidatorType.length) {
-          validator.valid = value.length >= validator.length;
-        } else {
-          validator.valid = value.length > 0;
+        if (this.formItem.validator) {
+          const validator = this.formItem.validator;
+          const value = this.value.trim();
+          if (validator.type === ValidatorType.length) {
+            validator.valid = value.length >= validator.length;
+          } else {
+            validator.valid = value.length > 0;
+          }
         }
+        this.formItem.value = this.value.trim();
       }
       this.dispatchEvent(
         new CustomEvent(FormItemEvent.updated, {

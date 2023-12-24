@@ -1,5 +1,7 @@
 import {LitElement, html} from 'lit';
 import {customElement, property, state} from 'lit/decorators.js';
+import {when} from 'lit/directives/when.js';
+
 import {Post} from '../global/post';
 import {items} from '../global/users';
 import {Form, FormEvent, FormItem, ValidatorType} from '../global/form';
@@ -67,7 +69,7 @@ export class MgNewPost extends LitElement {
   }
 
   formUpdated(e: CustomEvent) {
-    console.log('formUpdate:::', e.detail);
+    this.form = e.detail.form;
   }
 
   override render() {
@@ -76,6 +78,11 @@ export class MgNewPost extends LitElement {
     const postContent = JSON.stringify(this.postContent);
     const postTitle = JSON.stringify(this.postTitle);
     const values = JSON.stringify(items);
+    const button = when(
+      this.form.valid,
+      () => html` <button type="button">Save Post</button>`,
+      () => html` <button type="button" disabled>Save Post</button>`
+    );
 
     return html`
       <section>
@@ -102,7 +109,7 @@ export class MgNewPost extends LitElement {
             validator=${postContent}
           >
           </mg-textarea>
-          <button type="button">Save Post</button>
+          ${button}
         </mg-form>
       </section>
     `;
