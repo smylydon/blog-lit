@@ -60,7 +60,7 @@ export class MgLayout extends LitElement {
     );
 
     return html`
-      <header class="header">
+      <header>
         <h1>Redux Blog</h1>
         <nav>
           <ul>

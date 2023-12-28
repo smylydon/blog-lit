@@ -1,6 +1,7 @@
 import {LitElement, html} from 'lit';
 import {customElement, property, state} from 'lit/decorators.js';
 import {when} from 'lit/directives/when.js';
+import styles from './mg-new-post.scss';
 
 import {Post} from '../global/post';
 import {items} from '../global/users';
@@ -8,6 +9,8 @@ import {Form, FormEvent, FormItem, ValidatorType} from '../global/form';
 
 @customElement('mg-new-post')
 export class MgNewPost extends LitElement {
+  static override styles = styles;
+
   @property({attribute: false})
   model: Post = {
     title: '',
@@ -86,6 +89,7 @@ export class MgNewPost extends LitElement {
 
     return html`
       <section>
+        <h2>Add a New Post</h2>
         <mg-form name="addForm" title="New Post" form=${form}>
           <mg-input
             label="Post Title:"
