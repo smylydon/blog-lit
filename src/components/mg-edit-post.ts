@@ -7,9 +7,14 @@ import {Post} from '../global/post';
 import {items} from '../global/users';
 import {Form, FormEvent, FormItem, ValidatorType} from '../global/form';
 
-@customElement('mg-new-post')
-export class MgNewPost extends LitElement {
+@customElement('mg-edit-post')
+export class MgEditPost extends LitElement {
   static override styles = styles;
+
+  @property({attribute: 'post'})
+  set setPost(post: string) {
+    this.model = JSON.parse(post);
+  }
 
   @property({attribute: false})
   model: Post = {
@@ -57,7 +62,7 @@ export class MgNewPost extends LitElement {
 
   @state()
   form: Form = {
-    name: 'addForm',
+    name: 'editForm',
     valid: true,
     formItems: [this.postAuthor, this.postContent, this.postTitle],
   };
@@ -72,7 +77,7 @@ export class MgNewPost extends LitElement {
   }
 
   formUpdated(e: CustomEvent) {
-    if (e.detail.name === 'addForm') {
+    if (e.detail.name === 'editForm') {
       this.form = e.detail.form;
     }
   }
@@ -91,19 +96,19 @@ export class MgNewPost extends LitElement {
 
     return html`
       <section>
-        <h2>Add a New Post</h2>
-        <mg-form name="addForm" title="New Post" form=${form}>
+        <h2>Edit Post</h2>
+        <mg-form name="editForm" title="Edit Post" form=${form}>
           <mg-input
             label="Post Title:"
             name="postTitle"
-            value=""
+            value=${this.model.title}
             validator=${postTitle}
           >
           </mg-input>
           <mg-selector
             name="postAuthor"
             items=${values}
-            initialItem=""
+            value=${this.model.userId}
             label="Author:"
             validator=${postAuthor}
           >
@@ -111,11 +116,12 @@ export class MgNewPost extends LitElement {
           <mg-textarea
             label="Content:"
             name="postContent"
-            value=""
+            value=${this.model.body}
             validator=${postContent}
           >
           </mg-textarea>
           ${button}
+          <button class="delete-button" type="button">Delete Post</button>
         </mg-form>
       </section>
     `;
@@ -124,6 +130,6 @@ export class MgNewPost extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'mg-new-post': MgNewPost;
+    'mg-edit-post': MgEditPost;
   }
 }

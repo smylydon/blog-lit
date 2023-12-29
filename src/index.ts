@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 export * from './mg-blog';
+export * from './components/mg-edit-post';
 export * from './components/mg-home';
 export * from './components/mg-layout';
 export * from './components/mg-new-post';

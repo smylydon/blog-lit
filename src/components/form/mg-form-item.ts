@@ -8,10 +8,13 @@ type Constructor<T> = new (...args: any[]) => T;
 
 export declare class FormItemBaseInterface {
   set setInput(formItem: string);
+  getFormItemName(): string;
+  setFormItemName(name: string);
   formItem: FormItem;
   value: string;
   label: string;
   disable: boolean;
+  name?: string;
 }
 
 export const FormItemBase = <T extends Constructor<LitElement>>(
@@ -31,6 +34,9 @@ export const FormItemBase = <T extends Constructor<LitElement>>(
     };
 
     @property()
+    name = '';
+
+    @property()
     value = '';
 
     @property()
@@ -38,6 +44,16 @@ export const FormItemBase = <T extends Constructor<LitElement>>(
 
     @property()
     disable;
+
+    private formItemName = 'formItemName';
+
+    setFormItemName(name: string) {
+      this.formItemName = name.trim().length > 3 ? name : this.formItemName;
+    }
+
+    getFormItemName(): string {
+      return this.formItemName + new Date().getTime();
+    }
 
     override updated() {
       if (this.formItem && this.formItem.validator) {

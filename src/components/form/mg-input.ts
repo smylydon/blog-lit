@@ -8,23 +8,30 @@ import styles from './mg-form.scss';
 export class MgInput extends FormItemBase(LitElement) {
   static override styles = styles;
 
+  constructor() {
+    super();
+    this.setFormItemName('input');
+  }
+
   _onInput(e: KeyboardEvent) {
     e.stopImmediatePropagation();
     this.value = (e.target as HTMLInputElement).value;
   }
 
   override render() {
+    const name = this.getFormItemName();
+
     const output1 = when(
       this.label.length > 0,
-      () => html`<label htmlFor="input">${this.label}</label>`,
+      () => html`<label htmlFor=${name}>${this.label}</label>`,
       () => html``
     );
     const output2 = when(
       this.disable,
-      () => html` <input name="input" value=${this.value} disabled />`,
+      () => html` <input name=${name} value=${this.value} disabled />`,
       () =>
         html` <input
-          name="input"
+          name=${name}
           value=${this.value}
           @input=${this._onInput}
         />`

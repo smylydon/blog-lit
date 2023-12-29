@@ -34,7 +34,7 @@ export class MgHome extends LitElement {
         output = html`<mg-post issingle post=${value} />`;
       } else if (this.view === 'edit-post') {
         // will add new component
-        output = html`<mg-post issingle post=${value} />`;
+        output = html`<mg-edit-post post=${value} />`;
       }
     } else {
       output = this.posts.map((post: Post) => {

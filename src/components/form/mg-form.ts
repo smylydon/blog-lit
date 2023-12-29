@@ -70,7 +70,7 @@ export class MgForm extends LitElement {
       new CustomEvent(FormEvent.updated, {
         detail: {
           name: this.form.name,
-          form: this.form,
+          form: JSON.parse(JSON.stringify(this.form)), // simple clone
         },
         bubbles: true,
         composed: true,

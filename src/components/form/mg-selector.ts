@@ -21,23 +21,34 @@ export class MgSelector extends FormItemBase(LitElement) {
   @property()
   initialItem = '';
 
+  constructor() {
+    super();
+    this.setFormItemName('selector');
+  }
+
   _onSelected(e: Event) {
     e.stopImmediatePropagation();
     this.value = (e.target as HTMLSelectElement).value;
   }
 
   override render() {
+    const name = this.getFormItemName();
+
     const output1 = when(
       this.label.length > 0,
-      () => html`<label htmlFor="selector">${this.label}</label>`,
+      () => html`<label htmlFor=${name}>${this.label}</label>`,
       () => html``
     );
+
+    const initialItem = this.initialItem.trim();
+    const comparator = initialItem.length > 0 ? initialItem : this.value.trim();
 
     const choices = repeat(
       this.items,
       (item) => item.id,
       (item, index) => {
-        if (String(item.id) === this.initialItem) {
+        if (String(item.id) === comparator) {
+          this.value = comparator;
           return html` <option value=${index} selected>${item.item}</option> `;
         } else {
           return html` <option value=${index}>${item.item}</option> `;
@@ -47,11 +58,11 @@ export class MgSelector extends FormItemBase(LitElement) {
 
     const output2 = when(
       this.disable,
-      () => html`<select name="selector" disabled>
+      () => html`<select name=${name} disabled>
         <option value=""></option>
         ${choices}
       </select>`,
-      () => html`<select name="selector" @change=${this._onSelected}>
+      () => html`<select name=${name} @change=${this._onSelected}>
         <option value=""></option>
         ${choices}
       </select>`
