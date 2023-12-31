@@ -2,6 +2,7 @@ import {LitElement, html} from 'lit';
 import {customElement, property, state} from 'lit/decorators.js';
 import {Post} from '../global/post';
 import {posts} from '../global/data';
+import {HomeRoutes} from '../global/routes';
 import styles from './mg-home.scss';
 
 /**
@@ -13,7 +14,7 @@ export class MgHome extends LitElement {
   static override styles = styles;
 
   @property()
-  view = 'list-post';
+  view = HomeRoutes.Home;
 
   @property()
   postId: string | undefined;
@@ -22,7 +23,9 @@ export class MgHome extends LitElement {
   posts: Post[] = posts;
 
   override render() {
-    const isSinglePost = ['view-post', 'edit-post'].includes(this.view);
+    const isSinglePost = [HomeRoutes.ViewPost, HomeRoutes.EditPost].includes(
+      this.view
+    );
     const id = Number(this.postId);
     const postId = isFinite(id) ? id : undefined;
 
@@ -30,9 +33,9 @@ export class MgHome extends LitElement {
     if (isSinglePost) {
       const post = posts.find((post) => post.id === postId);
       const value = post ? JSON.stringify(post) : JSON.stringify({});
-      if (this.view === 'view-post') {
+      if (this.view === HomeRoutes.ViewPost) {
         output = html`<mg-post issingle post=${value} />`;
-      } else if (this.view === 'edit-post') {
+      } else if (this.view === HomeRoutes.EditPost) {
         // will add new component
         output = html`<mg-edit-post post=${value} />`;
       }
