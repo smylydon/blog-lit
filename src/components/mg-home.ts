@@ -34,7 +34,7 @@ export class MgHome extends LitElement {
       const post = posts.find((post) => post.id === postId);
       const value = post ? JSON.stringify(post) : JSON.stringify({});
       if (this.view === HomeRoutes.ViewPost) {
-        output = html`<mg-post issingle post=${value} />`;
+        output = html`<mg-post-single post=${value} />`;
       } else if (this.view === HomeRoutes.EditPost) {
         // will add new component
         output = html`<mg-edit-post post=${value} />`;
@@ -42,7 +42,7 @@ export class MgHome extends LitElement {
     } else {
       output = this.posts.map((post: Post) => {
         const value = JSON.stringify(post);
-        return html`<mg-post post=${value} />`;
+        return html`<mg-post-list post=${value} />`;
       });
     }
     return html`${output}`;

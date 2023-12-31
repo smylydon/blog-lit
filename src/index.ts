@@ -8,7 +8,8 @@ export * from './components/mg-edit-post';
 export * from './components/mg-home';
 export * from './components/mg-layout';
 export * from './components/mg-new-post';
-export * from './components/mg-post';
+export * from './components/mg-post-list';
+export * from './components/mg-post-single';
 export * from './components/mg-reaction-buttons';
 export * from './components/mg-time-ago';
 

@@ -1,6 +1,9 @@
-// article {
-//   margin: 0.5em;
-//   border: 1px solid #000;
-//   border-radius: 10px;
-//   padding: 1em;
-// }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:host {
+  font-size: 1.5rem;
+}

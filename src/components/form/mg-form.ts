@@ -27,11 +27,11 @@ export class MgForm extends LitElement {
   }
 
   firstUpdated() {
-    this.addEventListener(FormItemEvent.updated, this.changeView);
+    this.addEventListener(FormItemEvent.Updated, this.changeView);
   }
 
   disconnectedCallback() {
-    this.removeEventListener(FormItemEvent.updated, this.changeView);
+    this.removeEventListener(FormItemEvent.Updated, this.changeView);
     super.disconnectedCallback();
   }
 
@@ -67,7 +67,7 @@ export class MgForm extends LitElement {
       }
     }
     this.dispatchEvent(
-      new CustomEvent(FormEvent.updated, {
+      new CustomEvent(FormEvent.Updated, {
         detail: {
           name: this.form.name,
           form: JSON.parse(JSON.stringify(this.form)), // simple clone

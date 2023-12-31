@@ -1,14 +1,14 @@
 export enum FormEvent {
-  updated = 'mg-form:updated',
+  Updated = 'mg-form:updated',
 }
 
 export enum FormItemEvent {
-  updated = 'mg-formitem:updated',
+  Updated = 'mg-formitem:updated',
 }
 
 export enum ValidatorType {
-  exists = 'exists',
-  length = 'length',
+  Exists = 'exists',
+  Length = 'length',
 }
 
 export interface Validator {
@@ -17,11 +17,11 @@ export interface Validator {
 }
 
 export interface ExistsValidator extends Validator {
-  type: ValidatorType.exists;
+  type: ValidatorType.Exists;
 }
 
 export interface LengthValidator extends Validator {
-  type: ValidatorType.length;
+  type: ValidatorType.Length;
   length: number;
 }
 

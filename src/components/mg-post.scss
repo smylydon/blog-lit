@@ -1,3 +1,17 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:host {
+  font-size: 1.5rem;
+}
+
+a {
+  cursor: pointer;
+}
+
 .post-credit {
   font-size: 1rem;
 }
@@ -22,8 +36,4 @@ article {
   border: 1px solid #000;
   border-radius: 10px;
   padding: 1em;
-}
-
-a {
-  cursor: pointer;
 }

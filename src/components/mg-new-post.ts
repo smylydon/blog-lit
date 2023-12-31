@@ -27,7 +27,7 @@ export class MgNewPost extends LitElement {
     value: '',
     validator: {
       valid: true,
-      type: ValidatorType.length,
+      type: ValidatorType.Length,
       length: 3,
     },
   };
@@ -39,7 +39,7 @@ export class MgNewPost extends LitElement {
     value: '',
     validator: {
       valid: true,
-      type: ValidatorType.length,
+      type: ValidatorType.Length,
       length: 3,
     },
   };
@@ -51,7 +51,7 @@ export class MgNewPost extends LitElement {
     value: 0,
     validator: {
       valid: true,
-      type: ValidatorType.exists,
+      type: ValidatorType.Exists,
     },
   };
 
@@ -63,11 +63,11 @@ export class MgNewPost extends LitElement {
   };
 
   firstUpdated() {
-    this.addEventListener(FormEvent.updated, this.formUpdated);
+    this.addEventListener(FormEvent.Updated, this.formUpdated);
   }
 
   disconnectedCallback() {
-    this.removeEventListener(FormEvent.updated, this.formUpdated);
+    this.removeEventListener(FormEvent.Updated, this.formUpdated);
     super.disconnectedCallback();
   }
 
