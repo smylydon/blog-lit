@@ -1,7 +1,7 @@
 import {LitElement, html} from 'lit';
 import {customElement, property, state} from 'lit/decorators.js';
 import {Post} from '../global/post';
-import {posts} from '../global/data';
+import {posts} from '../global/postsData';
 import {HomeRoutes} from '../global/routes';
 import styles from './mg-home.scss';
 

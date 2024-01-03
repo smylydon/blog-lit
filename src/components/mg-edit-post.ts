@@ -4,7 +4,7 @@ import {when} from 'lit/directives/when.js';
 import styles from './mg-new-post.scss';
 
 import {Post} from '../global/post';
-import {items} from '../global/users';
+import {items} from '../global/usersData';
 import {Form, FormEvent, FormItem, ValidatorType} from '../global/form';
 
 @customElement('mg-edit-post')
