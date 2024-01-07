@@ -4,7 +4,7 @@ import {when} from 'lit/directives/when.js';
 import {MainRoutes, HomeRoutes, Route} from '../global/routes';
 import styles from './mg-layout.scss';
 import {PostActions, store} from '../global/store';
-import {connect} from '../global/state';
+import {StoreListenerInterface, connect} from '../global/state';
 
 const routes: Route[] = [
   {
@@ -36,7 +36,10 @@ const cloneObject = (item) => JSON.parse(JSON.stringify(item));
  *
  */
 @customElement('mg-layout')
-export class MgLayout extends connect(store)(LitElement) {
+export class MgLayout
+  extends connect(store)(LitElement)
+  implements StoreListenerInterface
+{
   static override styles = styles;
 
   @property({attribute: false})
@@ -89,6 +92,9 @@ export class MgLayout extends connect(store)(LitElement) {
 
   protected override firstUpdated(): void {
     store.dispatch(PostActions.getPosts());
+    setTimeout(() => {
+      store.dispatch(PostActions.loadPosts());
+    }, 50);
   }
 
   override updated() {

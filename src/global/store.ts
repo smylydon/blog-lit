@@ -1,11 +1,16 @@
 import {
   createAction,
+  createActionGroup,
   createReducer,
   createStore,
   on,
   EntityState,
+  Store,
+  createSideEffect,
+  ActionGroup,
 } from './state';
 import {Post, NewPost} from './post';
+import {apiService} from './api';
 
 export interface PostState extends EntityState<Post[]> {
   entities: Post[];
@@ -21,13 +26,13 @@ export const initialPostsState: PostState = {
   error: null,
 };
 
-export const PostActions = {
-  name: 'Post',
+export const PostActions = createActionGroup(<ActionGroup>{
+  slice: 'posts',
   getPosts: createAction('Get Posts'),
   loadPosts: createAction('Load Posts'),
   loadPostsSuccess: createAction<{posts: Post[]}>('Load Posts Success'),
   loadPostsFailure: createAction<{error: Error}>('Load Posts Failure'),
-};
+});
 
 const setState = (
   state: PostState,
@@ -37,32 +42,36 @@ const setState = (
   return <PostState>{...state, loaded, error};
 };
 
-function setAll(state) {
-  return <PostState>Object.assign({}, state, {
-    entities: [
-      {
-        name: 'hello test',
-      },
-    ],
-  });
+function setAll(posts: Post[], state: PostState) {
+  return <PostState>Object.assign({}, state, {entities: posts});
 }
 
 const postReducer = createReducer<PostState>(
   initialPostsState,
-  on(PostActions.getPosts, (state) => setAll(setState(state, true, null))),
-  on(PostActions.loadPosts, (state) => setState(state, false, null)),
-  //   on(PostActions.loadPostsSuccess, (state, {posts}) => {
-  //     return postsAdapter.setAll(posts, setState(state, true, null));
-  //   }),
+  on(PostActions.getPosts, (state) => setState(state, true, null)),
+  on(PostActions.loadPostsSuccess, (state, action) => {
+    return setAll(action.payload, setState(state, true, null));
+  }),
   on(PostActions.loadPostsFailure, (state, {error}) =>
     setState(state, true, error)
   )
 );
 
-const Store = createStore();
-Store.addReducer('post', postReducer);
+const postEffects = createSideEffect(
+  on(PostActions.loadPosts, (action, dispatcher) => {
+    const posts = [
+      {
+        hello: 'Oh me of my',
+      },
+    ];
 
-export const store = Store;
+    const result = PostActions.loadPostsSuccess(posts);
+    dispatcher.dispatch(result);
+  })
+);
+
+export const store: Store = createStore();
+store.addReducer(PostActions.slice, postReducer, postEffects);
 
 // export const PostActions = createActionGroup({
 //   source: 'Post',
