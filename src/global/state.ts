@@ -24,15 +24,16 @@ export interface EntityState<T> {
   entities: T;
 }
 
-interface ActionGroupBase {
+export interface ActionGroup {
   slice: string;
+  events: {
+    [propName: string]: (...any) => any;
+  };
 }
 
-interface ActionGroupFunction {
+export interface ActionsList {
   [propName: string]: (...any) => any;
 }
-
-export type ActionGroup = ActionGroupBase & ActionGroupFunction;
 
 const removeSpaces = (s: string) => s.replace(/\s+/, '');
 const getDateString = () => '' + new Date().getTime();
@@ -48,21 +49,23 @@ class Action {
   }
 }
 
-export function createActionGroup(group: ActionGroup): ActionGroup {
+export function createActionGroup(group: ActionGroup): ActionsList {
+  const output = {};
+  const events = group.events;
   let slice = typeof group['slice'] === 'string' ? group['slice'] : '';
   slice = removeSpaces(slice) + getDateString();
   group['slice'] = slice;
-  for (const key in group) {
-    if (group.hasOwnProperty(key)) {
-      const value = group[key];
-      if (key !== 'slice' && typeof value != 'string') {
+  for (const key in events) {
+    if (events.hasOwnProperty(key)) {
+      const value = events[key];
+      if (key !== 'slice') {
         const func: () => Action = value(slice);
-
-        group[key] = func;
+        output[key] = func;
       }
     }
   }
-  return group as ActionGroup;
+  output['slice'] = () => slice;
+  return output as ActionsList;
 }
 
 export function createAction<T>(type: string) {
@@ -165,7 +168,7 @@ export class Store implements StoreInterface {
 }
 
 export interface StoreInterface {
-  addReducer(name: string, s: State<unknown>);
+  addReducer(name: string, s: State<unknown>, sideEffects: SideEffect);
   register(x: StoreListenerInterface);
   dispatch(action: Action);
 }
@@ -177,7 +180,7 @@ export function createStore() {
 type Constructor<T> = new (...args: any[]) => T;
 
 export interface StoreListenerInterface {
-  stateChanged(state: Map<string, State<T>>);
+  stateChanged(state: Map<string, State<unknown>>);
 }
 
 export const connect = function (store: Store) {

@@ -8,6 +8,7 @@
   "type": "module",
   "scripts": {
     "build": "npm run clean && rollup --config rollup.config.js",
+    "build:test": "npm run clean && rollup --config rollup.config.test.js",
     "build:prod": "npm run clean && rollup --config rollup.config.prod.js",
     "build:watch": "npm run build --watch",
     "clean": "rimraf dist",
@@ -43,7 +44,6 @@
   "author": "Google LLC",
   "license": "BSD-3-Clause",
   "dependencies": {
-    "axios": "^1.6.3",
     "concurrently": "^8.2.2",
     "date-fns": "^2.29.3",
     "lit": "^2.2.4",

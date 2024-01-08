@@ -1,4 +1,3 @@
-import axios from 'axios';
 import {Post, PostEntity, NewPost} from './post';
 import {UserEntity} from './user';
 
@@ -10,19 +9,28 @@ export default class ApiService {
   users = [];
 
   public getPosts(): Promise<Post[]> {
-    return axios.get<PostEntity[]>(POSTS_URL).then((response) => {
-      return this.convertPostEntitiesToPosts(response.data as PostEntity[]);
-    });
+    return fetch(POSTS_URL)
+      .then((response: Response) => {
+        return response.json();
+      })
+      .then((data: Post[]) => {
+        return this.convertPostEntitiesToPosts(data);
+      });
   }
 
   public deletePost(post_id: number): Promise<number> {
-    return axios.delete<number>(`${POSTS_URL}/${post_id}`).then(() => {
+    return fetch(`${POSTS_URL}/${post_id}`, {
+      method: 'DELETE',
+    }).then(() => {
       return post_id;
     });
   }
 
   public savePost(post: NewPost): Promise<Post> {
-    return axios.post<PostEntity>(POSTS_URL, post).then((response) => {
+    return fetch(POSTS_URL, {
+      method: 'POST',
+      body: JSON.stringify(post),
+    }).then((response) => {
       const data = response.data as PostEntity;
       const postEntity: PostEntity = {
         ...post,
@@ -33,13 +41,16 @@ export default class ApiService {
   }
 
   public updatePost(post: Post): Promise<Post> {
-    return axios.put<PostEntity>(`${POSTS_URL}/${post.id}`, post).then(() => {
+    return fetch(`${POSTS_URL}/${post.id}`, {
+      method: 'PUT',
+      body: JSON.stringify(post),
+    }).then(() => {
       return post;
     });
   }
 
   public getUsers(): Promise<UserEntity[]> {
-    return axios.get<UserEntity[]>(USERS_URL).then((response) => {
+    return fetch(USERS_URL).then((response) => {
       return response.data as UserEntity[];
     });
   }

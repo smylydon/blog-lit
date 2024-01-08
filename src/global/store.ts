@@ -8,6 +8,7 @@ import {
   Store,
   createSideEffect,
   ActionGroup,
+  ActionsList,
 } from './state';
 import {Post, NewPost} from './post';
 import {apiService} from './api';
@@ -26,12 +27,14 @@ export const initialPostsState: PostState = {
   error: null,
 };
 
-export const PostActions = createActionGroup(<ActionGroup>{
+export const PostActions: ActionsList = createActionGroup(<ActionGroup>{
   slice: 'posts',
-  getPosts: createAction('Get Posts'),
-  loadPosts: createAction('Load Posts'),
-  loadPostsSuccess: createAction<{posts: Post[]}>('Load Posts Success'),
-  loadPostsFailure: createAction<{error: Error}>('Load Posts Failure'),
+  events: {
+    getPosts: createAction('Get Posts'),
+    loadPosts: createAction('Load Posts'),
+    loadPostsSuccess: createAction<{posts: Post[]}>('Load Posts Success'),
+    loadPostsFailure: createAction<{error: Error}>('Load Posts Failure'),
+  },
 });
 
 const setState = (
@@ -59,19 +62,15 @@ const postReducer = createReducer<PostState>(
 
 const postEffects = createSideEffect(
   on(PostActions.loadPosts, (action, dispatcher) => {
-    const posts = [
-      {
-        hello: 'Oh me of my',
-      },
-    ];
-
-    const result = PostActions.loadPostsSuccess(posts);
-    dispatcher.dispatch(result);
+    apiService.getPosts().then((posts) => {
+      const result = PostActions.loadPostsSuccess(posts);
+      dispatcher.dispatch(result);
+    });
   })
 );
 
 export const store: Store = createStore();
-store.addReducer(PostActions.slice, postReducer, postEffects);
+store.addReducer(PostActions.slice(), postReducer, postEffects);
 
 // export const PostActions = createActionGroup({
 //   source: 'Post',
