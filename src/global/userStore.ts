@@ -7,7 +7,7 @@ import {
   createSideEffect,
   ActionGroup,
   ActionsList,
-  State,
+  StoreInterface,
 } from './state';
 import {UserEntity} from './user';
 import {apiService} from './api';
@@ -68,11 +68,8 @@ export const userEffects = createSideEffect(
   })
 );
 
-export const getUsersFromStore = (state: Map<string, State<unknown>>) => {
-  const value: State<UserState> = state?.get(
-    UserActions.slice()
-  ) as State<UserState>;
-  const userState: UserState = value?.state;
+export const getUsersFromStore = (store: StoreInterface) => {
+  const userState: UserState = store.select(UserActions.slice());
   const entities: UserEntity[] = userState?.entities;
   return entities ?? [];
 };

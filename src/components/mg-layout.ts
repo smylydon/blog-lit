@@ -1,18 +1,11 @@
 import {LitElement, html} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import {when} from 'lit/directives/when.js';
-import {MainRoutes, HomeRoutes, Route} from '../global/routes';
 import styles from './mg-layout.scss';
-import {
-  Post,
-  PostActions,
-  PostState,
-  store,
-  State,
-  StoreListenerInterface,
-  UserActions,
-  connect,
-} from '../global';
+import {PostEvent} from '../global';
+
+import {MainRoutes, HomeRoutes, Route} from '../global/routes';
+import {cloneObject, PostActions, store, UserActions} from '../global';
 
 const routes: Route[] = [
   {
@@ -37,17 +30,12 @@ const routes: Route[] = [
   },
 ];
 
-const cloneObject = (item) => JSON.parse(JSON.stringify(item));
-
 /**
  * A blog layout element.
  *
  */
 @customElement('mg-layout')
-export class MgLayout
-  extends connect(store)(LitElement)
-  implements StoreListenerInterface
-{
+export class MgLayout extends LitElement {
   static override styles = styles;
 
   @property({attribute: false})
@@ -59,9 +47,6 @@ export class MgLayout
   @property()
   postId: string | undefined;
 
-  @property()
-  posts: Post[] = [];
-
   constructor() {
     super();
 
@@ -69,12 +54,17 @@ export class MgLayout
     window.addEventListener('popstate', this.popstate.bind(this));
     this.addEventListener(HomeRoutes.ViewPost, this.changeView);
     this.addEventListener(HomeRoutes.EditPost, this.changeView);
+    this.addEventListener(PostEvent.IncrementReaction, this.incrementReaction);
   }
 
   disconnectedCallback() {
     window.removeEventListener('popstate', this.popstate);
     this.removeEventListener(HomeRoutes.ViewPost, this.changeView);
     this.removeEventListener(HomeRoutes.EditPost, this.changeView);
+    this.removeEventListener(
+      PostEvent.IncrementReaction,
+      this.incrementReaction
+    );
     super.disconnectedCallback();
   }
 
@@ -86,6 +76,16 @@ export class MgLayout
     this.postId = id;
   }
 
+  incrementReaction(event: CustomEvent) {
+    const detail = event.detail;
+    store.dispatch(
+      PostActions.incrementReaction({
+        postId: detail.postId,
+        reactions: detail.reactions,
+      })
+    );
+  }
+
   private _onClickHome(event: Event) {
     event.preventDefault();
     this.route = MainRoutes.Home;
@@ -95,15 +95,6 @@ export class MgLayout
   private _onClickPost(event: Event) {
     event.preventDefault();
     this.route = MainRoutes.Post;
-  }
-
-  stateChanged(state: Map<string, State<unknown>>) {
-    const value: State<PostState> = state?.get(
-      PostActions.slice()
-    ) as State<PostState>;
-    const postState: PostState = value?.state;
-    const entities: Post[] = postState?.entities;
-    this.posts = entities ?? [];
   }
 
   protected override firstUpdated(): void {
@@ -156,16 +147,10 @@ export class MgLayout
   }
 
   override render() {
-    const posts = JSON.stringify(this.posts);
     const output = when(
       this.route === MainRoutes.Post,
       () => html`<mg-new-post />`,
-      () =>
-        html`<mg-home
-          posts=${posts}
-          view="${this.view}"
-          postId="${this.postId}"
-        />`
+      () => html`<mg-home view="${this.view}" postId="${this.postId}" />`
     );
 
     return html`

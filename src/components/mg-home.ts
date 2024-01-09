@@ -1,6 +1,15 @@
 import {LitElement, html} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
-import {Post} from '../global/post';
+import {repeat} from 'lit/directives/repeat.js';
+import {
+  Post,
+  PostActions,
+  PostState,
+  store,
+  StoreInterface,
+  StoreListenerInterface,
+  connect,
+} from '../global';
 import {HomeRoutes} from '../global/routes';
 import styles from './mg-home.scss';
 
@@ -9,7 +18,10 @@ import styles from './mg-home.scss';
  * display a list of posts.
  */
 @customElement('mg-home')
-export class MgHome extends LitElement {
+export class MgHome
+  extends connect(store)(LitElement)
+  implements StoreListenerInterface
+{
   static override styles = styles;
 
   @property()
@@ -18,13 +30,18 @@ export class MgHome extends LitElement {
   @property()
   postId: string | undefined;
 
-  @property({attribute: 'posts'})
-  set setPosts(posts: string) {
-    this.model = JSON.parse(posts);
-  }
-
   @property({attribute: false})
   model: Post[] = [];
+
+  stateChanged(store: StoreInterface) {
+    const postState: PostState = store.select(PostActions.slice());
+    const entities: Post[] = postState?.entities;
+    this.model = entities ?? [];
+  }
+
+  protected override firstUpdated(): void {
+    store.dispatch(PostActions.getPosts());
+  }
 
   override render() {
     const isSinglePost = [HomeRoutes.ViewPost, HomeRoutes.EditPost].includes(
@@ -44,10 +61,14 @@ export class MgHome extends LitElement {
         output = html`<mg-edit-post post=${value} />`;
       }
     } else {
-      output = this.model.map((post: Post) => {
-        const value = JSON.stringify(post);
-        return html`<mg-post-list post=${value} />`;
-      });
+      output = repeat(
+        this.model,
+        (post: Post) => post.id,
+        (post: Post) => {
+          const value = JSON.stringify(post);
+          return html`<mg-post-list post=${value} />`;
+        }
+      );
     }
     return html`${output}`;
   }

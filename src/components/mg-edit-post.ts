@@ -6,7 +6,7 @@ import styles from './mg-new-post.scss';
 import {
   Post,
   store,
-  State,
+  StoreInterface,
   StoreListenerInterface,
   UserActions,
   connect,
@@ -88,8 +88,8 @@ export class MgEditPost
     store.dispatch(UserActions.getUsers());
   }
 
-  stateChanged(state: Map<string, State<unknown>>) {
-    this.users = getUsersFromStore(state);
+  stateChanged(store: StoreInterface) {
+    this.users = getUsersFromStore(store);
   }
 
   disconnectedCallback() {
