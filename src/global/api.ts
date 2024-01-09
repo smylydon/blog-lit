@@ -5,9 +5,6 @@ const USERS_URL = 'https://jsonplaceholder.typicode.com/users';
 const POSTS_URL = 'https://jsonplaceholder.typicode.com/posts';
 
 export default class ApiService {
-  posts: Post[] = [];
-  users = [];
-
   public getPosts(): Promise<Post[]> {
     return fetch(POSTS_URL)
       .then((response: Response) => {
@@ -50,9 +47,13 @@ export default class ApiService {
   }
 
   public getUsers(): Promise<UserEntity[]> {
-    return fetch(USERS_URL).then((response) => {
-      return response.data as UserEntity[];
-    });
+    return fetch(USERS_URL)
+      .then((response: Response) => {
+        return response.json();
+      })
+      .then((data: UserEntity[]) => {
+        return data;
+      });
   }
 
   protected convertPostEntityToPost(postEntity: PostEntity): Post {

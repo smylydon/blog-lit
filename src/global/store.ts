@@ -1,76 +1,11 @@
-import {
-  createAction,
-  createActionGroup,
-  createReducer,
-  createStore,
-  on,
-  EntityState,
-  Store,
-  createSideEffect,
-  ActionGroup,
-  ActionsList,
-} from './state';
-import {Post, NewPost} from './post';
-import {apiService} from './api';
+import {createStore, Store} from './state';
 
-export interface PostState extends EntityState<Post[]> {
-  entities: Post[];
-  selectedId?: string | number; // which Labels record has been selected
-  loaded: boolean;
-  error?: Error | null; // last known error (if any)
-}
-
-export const initialPostsState: PostState = {
-  entities: [],
-  // set initial required properties
-  loaded: false,
-  error: null,
-};
-
-export const PostActions: ActionsList = createActionGroup(<ActionGroup>{
-  slice: 'posts',
-  events: {
-    getPosts: createAction('Get Posts'),
-    loadPosts: createAction('Load Posts'),
-    loadPostsSuccess: createAction<{posts: Post[]}>('Load Posts Success'),
-    loadPostsFailure: createAction<{error: Error}>('Load Posts Failure'),
-  },
-});
-
-const setState = (
-  state: PostState,
-  loaded: boolean,
-  error: Error | null = null
-): PostState => {
-  return <PostState>{...state, loaded, error};
-};
-
-function setAll(posts: Post[], state: PostState) {
-  return <PostState>Object.assign({}, state, {entities: posts});
-}
-
-const postReducer = createReducer<PostState>(
-  initialPostsState,
-  on(PostActions.getPosts, (state) => setState(state, true, null)),
-  on(PostActions.loadPostsSuccess, (state, action) => {
-    return setAll(action.payload, setState(state, true, null));
-  }),
-  on(PostActions.loadPostsFailure, (state, {error}) =>
-    setState(state, true, error)
-  )
-);
-
-const postEffects = createSideEffect(
-  on(PostActions.loadPosts, (action, dispatcher) => {
-    apiService.getPosts().then((posts) => {
-      const result = PostActions.loadPostsSuccess(posts);
-      dispatcher.dispatch(result);
-    });
-  })
-);
+import {PostActions, postReducer, postEffects} from './postStore';
+import {UserActions, userReducer, userEffects} from './userStore';
 
 export const store: Store = createStore();
 store.addReducer(PostActions.slice(), postReducer, postEffects);
+store.addReducer(UserActions.slice(), userReducer, userEffects);
 
 // export const PostActions = createActionGroup({
 //   source: 'Post',

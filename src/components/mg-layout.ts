@@ -1,10 +1,18 @@
 import {LitElement, html} from 'lit';
-import {customElement, property, state} from 'lit/decorators.js';
+import {customElement, property} from 'lit/decorators.js';
 import {when} from 'lit/directives/when.js';
 import {MainRoutes, HomeRoutes, Route} from '../global/routes';
 import styles from './mg-layout.scss';
-import {PostActions, store} from '../global/store';
-import {StoreListenerInterface, connect} from '../global/state';
+import {
+  Post,
+  PostActions,
+  PostState,
+  store,
+  State,
+  StoreListenerInterface,
+  UserActions,
+  connect,
+} from '../global';
 
 const routes: Route[] = [
   {
@@ -51,6 +59,9 @@ export class MgLayout
   @property()
   postId: string | undefined;
 
+  @property()
+  posts: Post[] = [];
+
   constructor() {
     super();
 
@@ -86,15 +97,18 @@ export class MgLayout
     this.route = MainRoutes.Post;
   }
 
-  stateChanged(state) {
-    console.log('stateChanged:::', state);
+  stateChanged(state: Map<string, State<unknown>>) {
+    const value: State<PostState> = state?.get(
+      PostActions.slice()
+    ) as State<PostState>;
+    const postState: PostState = value?.state;
+    const entities: Post[] = postState?.entities;
+    this.posts = entities ?? [];
   }
 
   protected override firstUpdated(): void {
-    store.dispatch(PostActions.getPosts());
-    setTimeout(() => {
-      store.dispatch(PostActions.loadPosts());
-    }, 50);
+    store.dispatch(PostActions.loadPosts());
+    store.dispatch(UserActions.loadUsers());
   }
 
   override updated() {
@@ -142,10 +156,16 @@ export class MgLayout
   }
 
   override render() {
+    const posts = JSON.stringify(this.posts);
     const output = when(
       this.route === MainRoutes.Post,
       () => html`<mg-new-post />`,
-      () => html`<mg-home view="${this.view}" postId="${this.postId}" />`
+      () =>
+        html`<mg-home
+          posts=${posts}
+          view="${this.view}"
+          postId="${this.postId}"
+        />`
     );
 
     return html`

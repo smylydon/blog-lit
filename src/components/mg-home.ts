@@ -1,7 +1,6 @@
 import {LitElement, html} from 'lit';
-import {customElement, property, state} from 'lit/decorators.js';
+import {customElement, property} from 'lit/decorators.js';
 import {Post} from '../global/post';
-import {posts} from '../global/postsData';
 import {HomeRoutes} from '../global/routes';
 import styles from './mg-home.scss';
 
@@ -19,8 +18,13 @@ export class MgHome extends LitElement {
   @property()
   postId: string | undefined;
 
-  @state()
-  posts: Post[] = posts;
+  @property({attribute: 'posts'})
+  set setPosts(posts: string) {
+    this.model = JSON.parse(posts);
+  }
+
+  @property({attribute: false})
+  model: Post[] = [];
 
   override render() {
     const isSinglePost = [HomeRoutes.ViewPost, HomeRoutes.EditPost].includes(
@@ -31,7 +35,7 @@ export class MgHome extends LitElement {
 
     let output;
     if (isSinglePost) {
-      const post = posts.find((post) => post.id === postId);
+      const post = this.model.find((post) => post.id === postId);
       const value = post ? JSON.stringify(post) : JSON.stringify({});
       if (this.view === HomeRoutes.ViewPost) {
         output = html`<mg-post-single post=${value} />`;
@@ -40,7 +44,7 @@ export class MgHome extends LitElement {
         output = html`<mg-edit-post post=${value} />`;
       }
     } else {
-      output = this.posts.map((post: Post) => {
+      output = this.model.map((post: Post) => {
         const value = JSON.stringify(post);
         return html`<mg-post-list post=${value} />`;
       });

@@ -3,12 +3,25 @@ import {customElement, property, state} from 'lit/decorators.js';
 import {when} from 'lit/directives/when.js';
 import styles from './mg-new-post.scss';
 
-import {Post} from '../global/post';
-import {items} from '../global/usersData';
+import {
+  Post,
+  store,
+  State,
+  StoreListenerInterface,
+  UserActions,
+  connect,
+  UserEntity,
+  getUsersFromStore,
+  getSelectorValues,
+} from '../global';
+
 import {Form, FormEvent, FormItem, ValidatorType} from '../global/form';
 
 @customElement('mg-edit-post')
-export class MgEditPost extends LitElement {
+export class MgEditPost
+  extends connect(store)(LitElement)
+  implements StoreListenerInterface
+{
   static override styles = styles;
 
   @property({attribute: 'post'})
@@ -67,8 +80,16 @@ export class MgEditPost extends LitElement {
     formItems: [this.postAuthor, this.postContent, this.postTitle],
   };
 
+  @state()
+  users: UserEntity[] = [];
+
   firstUpdated() {
     this.addEventListener(FormEvent.Updated, this.formUpdated);
+    store.dispatch(UserActions.getUsers());
+  }
+
+  stateChanged(state: Map<string, State<unknown>>) {
+    this.users = getUsersFromStore(state);
   }
 
   disconnectedCallback() {
@@ -83,6 +104,7 @@ export class MgEditPost extends LitElement {
   }
 
   override render() {
+    const items = getSelectorValues(this.users);
     const form = JSON.stringify(this.form);
     const postAuthor = JSON.stringify(this.postAuthor);
     const postContent = JSON.stringify(this.postContent);
