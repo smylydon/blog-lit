@@ -119,6 +119,11 @@ export class Store implements StoreInterface {
     this.listeners = new Set();
   }
 
+  select<T>(slice: string): T {
+    const state: State<T> = <State<T>>this.store.get(slice);
+    return state?.state;
+  }
+
   register(x: StoreListenerInterface) {
     this.listeners.add(x);
   }
@@ -151,7 +156,7 @@ export class Store implements StoreInterface {
           const state = clause(currentState, action);
           store.state = state;
           this.listeners.forEach((item: StoreListenerInterface) => {
-            item.stateChanged(this.store);
+            item.stateChanged(this);
           });
           // an rxjs subject would be lovely right now.
         }
@@ -169,6 +174,7 @@ export class Store implements StoreInterface {
 
 export interface StoreInterface {
   addReducer(name: string, s: State<unknown>, sideEffects: SideEffect);
+  select<T>(slice: string): T;
   register(x: StoreListenerInterface);
   dispatch(action: Action);
 }
@@ -180,7 +186,7 @@ export function createStore() {
 type Constructor<T> = new (...args: any[]) => T;
 
 export interface StoreListenerInterface {
-  stateChanged(state: Map<string, State<unknown>>);
+  stateChanged(store: StoreInterface);
 }
 
 export const connect = function (store: Store) {
@@ -194,7 +200,7 @@ export const connect = function (store: Store) {
         store.register(this);
       }
 
-      abstract stateChanged(state: Map<string, State<T>>);
+      abstract stateChanged(store: StoreInterface);
     }
 
     return MgPostBaseElement as Constructor<StoreListenerInterface> & T;

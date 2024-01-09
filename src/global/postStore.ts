@@ -8,7 +8,7 @@ import {
   ActionGroup,
   ActionsList,
 } from './state';
-import {Post} from './post';
+import {NewPost, Post, PostEventPayload} from './post';
 import {apiService} from './api';
 
 export interface PostState extends EntityState<Post[]> {
@@ -29,9 +29,25 @@ export const PostActions: ActionsList = createActionGroup(<ActionGroup>{
   slice: 'posts',
   events: {
     getPosts: createAction('Get Posts'),
+    incrementReaction: createAction<{postEventPayload: PostEventPayload}>(
+      'Increment Reaction'
+    ),
+    deletePost: createAction<{postEventPayload: PostEventPayload}>(
+      'Delete Post'
+    ),
+    deletePostSuccess: createAction<{post: Post}>('Delete Post Success'),
+    deletePostFailure: createAction<{error: Error}>('Delete Post Failure'),
     loadPosts: createAction('Load Posts'),
     loadPostsSuccess: createAction<{posts: Post[]}>('Load Posts Success'),
     loadPostsFailure: createAction<{error: Error}>('Load Posts Failure'),
+    savePost: createAction<{postEventPayload: PostEventPayload}>('Save Post'),
+    savePostSuccess: createAction<{post: Post}>('Save Post Success'),
+    savePostFailure: createAction<{error: Error}>('Save Post Failure'),
+    updatePost: createAction<{postEventPayload: PostEventPayload}>(
+      'Update Post'
+    ),
+    updatePostSuccess: createAction<{post: Post}>('Update Post Success'),
+    updatePostFailure: createAction<{error: Error}>('Update Post Failure'),
   },
 });
 
@@ -55,6 +71,35 @@ export const postReducer = createReducer<PostState>(
   }),
   on(PostActions.loadPostsFailure, (state, {error}) =>
     setState(state, true, error)
+  ),
+  on(PostActions.incrementReaction, (state, action) => {
+    const postEventPayload: PostEventPayload = action.payload;
+    const postId = Number(postEventPayload.postId);
+    const oldPost = postEventPayload.post;
+    const newPost: Post = state.entities.find(
+      (post: Post) => post.id === postId
+    );
+    if (newPost) {
+      newPost.reactions = (<Post>oldPost).reactions;
+      state.entities = [...state.entities];
+    }
+    return setState(state, true, null);
+  }),
+  on(PostActions.deletePostSuccess, (state, action) => {
+    const postId = Number(action.payload);
+    state.entities = state.entities.filter((post: Post) => post.id !== postId);
+    return setState(state, true, null);
+  }),
+  on(PostActions.deletePostFailure, (state, {error}) =>
+    setState(state, true, error)
+  ),
+  on(PostActions.savePostSuccess, (state, action) => {
+    const post: Post = action.payload;
+    state.entities = [...state.entities, post];
+    return setState(state, true, null);
+  }),
+  on(PostActions.savePostFailure, (state, {error}) =>
+    setState(state, true, error)
   )
 );
 
@@ -62,6 +107,22 @@ export const postEffects = createSideEffect(
   on(PostActions.loadPosts, (action, dispatcher) => {
     apiService.getPosts().then((posts) => {
       const result = PostActions.loadPostsSuccess(posts);
+      dispatcher.dispatch(result);
+    });
+  }),
+  on(PostActions.deletePost, (action, dispatcher) => {
+    const postEventPayload: PostEventPayload = action.payload;
+    const postId = Number(postEventPayload.postId);
+    apiService.deletePost(postId).then((id) => {
+      const result = PostActions.deletePostSuccess(id);
+      dispatcher.dispatch(result);
+    });
+  }),
+  on(PostActions.savePost, (action, dispatcher) => {
+    const postEventPayload: PostEventPayload = action.payload;
+    const newPost: NewPost = postEventPayload.post;
+    apiService.savePost(newPost).then((post: Post) => {
+      const result = PostActions.savePostSuccess(post);
       dispatcher.dispatch(result);
     });
   })

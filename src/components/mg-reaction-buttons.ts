@@ -1,7 +1,7 @@
 import {LitElement, html} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 
-import {Post} from '../global/post';
+import {Post, PostEvent} from '../global/post';
 import styles from './mg-reaction-buttons.scss';
 
 @customElement('mg-reaction-buttons')
@@ -54,14 +54,19 @@ export class MgReactionButtons extends LitElement {
   }
 
   _onClick(emoji: string) {
-    return new CustomEvent('increment-reaction', {
-      detail: {
-        id: this.model.id,
-        emoji,
-      },
-      bubbles: true,
-      composed: true,
-    });
+    const reactions = this.model.reactions;
+    reactions[emoji] += 1;
+
+    this.dispatchEvent(
+      new CustomEvent(PostEvent.IncrementReaction, {
+        detail: {
+          postId: this.model.id,
+          post: this.model,
+        },
+        bubbles: true,
+        composed: true,
+      })
+    );
   }
 }
 
