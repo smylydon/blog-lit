@@ -27,9 +27,11 @@ export type UpdateObject = {post: Post; value: Reactions};
 
 export enum PostEvent {
   IncrementReaction = 'post:increment-reaction',
+  DeletePost = 'post:delete',
+  SavePost = 'post:save',
 }
 
-export interface ReactionsEvent {
+export interface PostEventPayload {
   postId: string;
-  reactions: ReactionsBody;
+  post?: Post;
 }

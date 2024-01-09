@@ -5,6 +5,7 @@ import styles from './mg-new-post.scss';
 
 import {
   Post,
+  PostEvent,
   store,
   StoreInterface,
   StoreListenerInterface,
@@ -103,6 +104,21 @@ export class MgEditPost
     }
   }
 
+  _clickDeletePost(event: Event) {
+    event.stopImmediatePropagation();
+
+    this.dispatchEvent(
+      new CustomEvent(PostEvent.DeletePost, {
+        detail: {
+          postId: this.model.id,
+          post: this.model,
+        },
+        bubbles: true,
+        composed: true,
+      })
+    );
+  }
+
   override render() {
     const items = getSelectorValues(this.users);
     const form = JSON.stringify(this.form);
@@ -143,7 +159,13 @@ export class MgEditPost
           >
           </mg-textarea>
           ${button}
-          <button class="delete-button" type="button">Delete Post</button>
+          <button
+            class="delete-button"
+            @click=${this._clickDeletePost}
+            type="button"
+          >
+            Delete Post
+          </button>
         </mg-form>
       </section>
     `;

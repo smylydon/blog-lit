@@ -18,23 +18,30 @@ export default class ApiService {
   public deletePost(post_id: number): Promise<number> {
     return fetch(`${POSTS_URL}/${post_id}`, {
       method: 'DELETE',
-    }).then(() => {
-      return post_id;
-    });
+    })
+      .then((response: Response) => {
+        return response.json();
+      })
+      .then(() => {
+        return post_id;
+      });
   }
 
   public savePost(post: NewPost): Promise<Post> {
     return fetch(POSTS_URL, {
       method: 'POST',
       body: JSON.stringify(post),
-    }).then((response) => {
-      const data = response.data as PostEntity;
-      const postEntity: PostEntity = {
-        ...post,
-        id: data.id,
-      };
-      return this.convertPostEntityToPost(postEntity);
-    });
+    })
+      .then((response: Response) => {
+        return response.json();
+      })
+      .then((data: PostEntity) => {
+        const postEntity: PostEntity = {
+          ...post,
+          id: data.id,
+        };
+        return this.convertPostEntityToPost(postEntity);
+      });
   }
 
   public updatePost(post: Post): Promise<Post> {

@@ -2,7 +2,7 @@ import {LitElement, html} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import {when} from 'lit/directives/when.js';
 import styles from './mg-layout.scss';
-import {PostEvent} from '../global';
+import {PostEvent, PostEventPayload} from '../global';
 
 import {MainRoutes, HomeRoutes, Route} from '../global/routes';
 import {cloneObject, PostActions, store, UserActions} from '../global';
@@ -55,6 +55,7 @@ export class MgLayout extends LitElement {
     this.addEventListener(HomeRoutes.ViewPost, this.changeView);
     this.addEventListener(HomeRoutes.EditPost, this.changeView);
     this.addEventListener(PostEvent.IncrementReaction, this.incrementReaction);
+    this.addEventListener(PostEvent.DeletePost, this.deletePost);
   }
 
   disconnectedCallback() {
@@ -65,6 +66,7 @@ export class MgLayout extends LitElement {
       PostEvent.IncrementReaction,
       this.incrementReaction
     );
+    this.removeEventListener(PostEvent.DeletePost, this.deletePost);
     super.disconnectedCallback();
   }
 
@@ -77,13 +79,25 @@ export class MgLayout extends LitElement {
   }
 
   incrementReaction(event: CustomEvent) {
-    const detail = event.detail;
+    const detail: PostEventPayload = event.detail;
     store.dispatch(
       PostActions.incrementReaction({
         postId: detail.postId,
-        reactions: detail.reactions,
+        post: detail.post,
       })
     );
+  }
+
+  deletePost(event: CustomEvent) {
+    const detail: PostEventPayload = event.detail;
+    store.dispatch(
+      PostActions.deletePost({
+        postId: detail.postId,
+        post: detail.post,
+      })
+    );
+    this.route = MainRoutes.Home;
+    this.view = HomeRoutes.Home;
   }
 
   private _onClickHome(event: Event) {

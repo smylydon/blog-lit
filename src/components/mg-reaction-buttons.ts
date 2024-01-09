@@ -61,8 +61,7 @@ export class MgReactionButtons extends LitElement {
       new CustomEvent(PostEvent.IncrementReaction, {
         detail: {
           postId: this.model.id,
-          emoji,
-          reactions,
+          post: this.model,
         },
         bubbles: true,
         composed: true,
