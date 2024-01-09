@@ -29,9 +29,10 @@ export enum PostEvent {
   IncrementReaction = 'post:increment-reaction',
   DeletePost = 'post:delete',
   SavePost = 'post:save',
+  UpdatePost = 'post:update',
 }
 
 export interface PostEventPayload {
   postId: string;
-  post?: Post;
+  post?: Post | NewPost;
 }

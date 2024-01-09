@@ -35,10 +35,10 @@ export default class ApiService {
       .then((response: Response) => {
         return response.json();
       })
-      .then((data: PostEntity) => {
+      .then(() => {
         const postEntity: PostEntity = {
           ...post,
-          id: data.id,
+          id: new Date().getTime(),
         };
         return this.convertPostEntityToPost(postEntity);
       });
@@ -48,9 +48,17 @@ export default class ApiService {
     return fetch(`${POSTS_URL}/${post.id}`, {
       method: 'PUT',
       body: JSON.stringify(post),
-    }).then(() => {
-      return post;
-    });
+    })
+      .then((response: Response) => {
+        return response.json();
+      })
+      .then((data: PostEntity) => {
+        const postEntity: PostEntity = {
+          ...post,
+          id: data.id,
+        };
+        return this.convertPostEntityToPost(postEntity);
+      });
   }
 
   public getUsers(): Promise<UserEntity[]> {

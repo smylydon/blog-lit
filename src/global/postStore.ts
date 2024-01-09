@@ -8,7 +8,7 @@ import {
   ActionGroup,
   ActionsList,
 } from './state';
-import {Post, PostEventPayload} from './post';
+import {NewPost, Post, PostEventPayload} from './post';
 import {apiService} from './api';
 
 export interface PostState extends EntityState<Post[]> {
@@ -43,6 +43,11 @@ export const PostActions: ActionsList = createActionGroup(<ActionGroup>{
     savePost: createAction<{postEventPayload: PostEventPayload}>('Save Post'),
     savePostSuccess: createAction<{post: Post}>('Save Post Success'),
     savePostFailure: createAction<{error: Error}>('Save Post Failure'),
+    updatePost: createAction<{postEventPayload: PostEventPayload}>(
+      'Update Post'
+    ),
+    updatePostSuccess: createAction<{post: Post}>('Update Post Success'),
+    updatePostFailure: createAction<{error: Error}>('Update Post Failure'),
   },
 });
 
@@ -75,7 +80,7 @@ export const postReducer = createReducer<PostState>(
       (post: Post) => post.id === postId
     );
     if (newPost) {
-      newPost.reactions = oldPost.reactions;
+      newPost.reactions = (<Post>oldPost).reactions;
       state.entities = [...state.entities];
     }
     return setState(state, true, null);
@@ -84,7 +89,18 @@ export const postReducer = createReducer<PostState>(
     const postId = Number(action.payload);
     state.entities = state.entities.filter((post: Post) => post.id !== postId);
     return setState(state, true, null);
-  })
+  }),
+  on(PostActions.deletePostFailure, (state, {error}) =>
+    setState(state, true, error)
+  ),
+  on(PostActions.savePostSuccess, (state, action) => {
+    const post: Post = action.payload;
+    state.entities = [...state.entities, post];
+    return setState(state, true, null);
+  }),
+  on(PostActions.savePostFailure, (state, {error}) =>
+    setState(state, true, error)
+  )
 );
 
 export const postEffects = createSideEffect(
@@ -99,6 +115,14 @@ export const postEffects = createSideEffect(
     const postId = Number(postEventPayload.postId);
     apiService.deletePost(postId).then((id) => {
       const result = PostActions.deletePostSuccess(id);
+      dispatcher.dispatch(result);
+    });
+  }),
+  on(PostActions.savePost, (action, dispatcher) => {
+    const postEventPayload: PostEventPayload = action.payload;
+    const newPost: NewPost = postEventPayload.post;
+    apiService.savePost(newPost).then((post: Post) => {
+      const result = PostActions.savePostSuccess(post);
       dispatcher.dispatch(result);
     });
   })

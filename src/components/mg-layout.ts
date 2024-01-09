@@ -56,6 +56,7 @@ export class MgLayout extends LitElement {
     this.addEventListener(HomeRoutes.EditPost, this.changeView);
     this.addEventListener(PostEvent.IncrementReaction, this.incrementReaction);
     this.addEventListener(PostEvent.DeletePost, this.deletePost);
+    this.addEventListener(PostEvent.SavePost, this.savePost);
   }
 
   disconnectedCallback() {
@@ -67,6 +68,7 @@ export class MgLayout extends LitElement {
       this.incrementReaction
     );
     this.removeEventListener(PostEvent.DeletePost, this.deletePost);
+    this.removeEventListener(PostEvent.SavePost, this.savePost);
     super.disconnectedCallback();
   }
 
@@ -92,6 +94,18 @@ export class MgLayout extends LitElement {
     const detail: PostEventPayload = event.detail;
     store.dispatch(
       PostActions.deletePost({
+        postId: detail.postId,
+        post: detail.post,
+      })
+    );
+    this.route = MainRoutes.Home;
+    this.view = HomeRoutes.Home;
+  }
+
+  savePost(event: CustomEvent) {
+    const detail: PostEventPayload = event.detail;
+    store.dispatch(
+      PostActions.savePost({
         postId: detail.postId,
         post: detail.post,
       })

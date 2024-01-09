@@ -5,6 +5,7 @@ import styles from './mg-new-post.scss';
 
 import {
   Post,
+  PostEvent,
   store,
   StoreInterface,
   StoreListenerInterface,
@@ -13,6 +14,7 @@ import {
   UserEntity,
   getUsersFromStore,
   getSelectorValues,
+  NewPost,
 } from '../global';
 
 import {Form, FormEvent, FormItem, ValidatorType} from '../global/form';
@@ -98,6 +100,35 @@ export class MgNewPost
     }
   }
 
+  _clickSavePost(event: Event) {
+    event.stopImmediatePropagation();
+    const formItems: Map<string, FormItem> = new Map();
+    this.form.formItems.forEach((formItem: FormItem) => {
+      formItems.set(formItem.name, formItem);
+    });
+
+    const postTitle = formItems.get('postTitle');
+    const postAuthor = formItems.get('postAuthor');
+    const postContent = formItems.get('postContent');
+
+    const post: NewPost = <NewPost>{
+      title: postTitle?.value,
+      userId: postAuthor?.value,
+      body: postContent?.value,
+    };
+
+    this.dispatchEvent(
+      new CustomEvent(PostEvent.SavePost, {
+        detail: {
+          postId: this.model.id,
+          post,
+        },
+        bubbles: true,
+        composed: true,
+      })
+    );
+  }
+
   override render() {
     const items = getSelectorValues(this.users);
     const form = JSON.stringify(this.form);
@@ -107,7 +138,10 @@ export class MgNewPost
     const values = JSON.stringify(items);
     const button = when(
       this.form.valid,
-      () => html` <button type="button">Save Post</button>`,
+      () =>
+        html` <button type="button" @click=${this._clickSavePost}>
+          Save Post
+        </button>`,
       () => html` <button type="button" disabled>Save Post</button>`
     );
 
