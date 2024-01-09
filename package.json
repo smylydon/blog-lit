@@ -8,6 +8,7 @@
   "type": "module",
   "scripts": {
     "build": "npm run clean && rollup --config rollup.config.js",
+    "build:test": "npm run clean && rollup --config rollup.config.test.js",
     "build:prod": "npm run clean && rollup --config rollup.config.prod.js",
     "build:watch": "npm run build --watch",
     "clean": "rimraf dist",
@@ -44,9 +45,9 @@
   "license": "BSD-3-Clause",
   "dependencies": {
     "concurrently": "^8.2.2",
+    "date-fns": "^2.29.3",
     "lit": "^2.2.4",
-    "tslib": "^2.4.0",
-    "date-fns": "^2.29.3"
+    "tslib": "^2.4.0"
   },
   "devDependencies": {
     "@11ty/eleventy": "^2.0.1",
@@ -57,6 +58,7 @@
     "@rollup/plugin-replace": "^5.0.2",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^11.1.5",
+    "@types/node": "^20.10.6",
     "@typescript-eslint/eslint-plugin": "^5.25.0",
     "@typescript-eslint/parser": "^5.25.0",
     "@web/dev-server": "^0.1.34",

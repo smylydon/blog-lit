@@ -3,6 +3,16 @@ import {customElement, property} from 'lit/decorators.js';
 import {when} from 'lit/directives/when.js';
 import {MainRoutes, HomeRoutes, Route} from '../global/routes';
 import styles from './mg-layout.scss';
+import {
+  Post,
+  PostActions,
+  PostState,
+  store,
+  State,
+  StoreListenerInterface,
+  UserActions,
+  connect,
+} from '../global';
 
 const routes: Route[] = [
   {
@@ -27,12 +37,17 @@ const routes: Route[] = [
   },
 ];
 
+const cloneObject = (item) => JSON.parse(JSON.stringify(item));
+
 /**
  * A blog layout element.
  *
  */
 @customElement('mg-layout')
-export class MgLayout extends LitElement {
+export class MgLayout
+  extends connect(store)(LitElement)
+  implements StoreListenerInterface
+{
   static override styles = styles;
 
   @property({attribute: false})
@@ -44,8 +59,12 @@ export class MgLayout extends LitElement {
   @property()
   postId: string | undefined;
 
+  @property()
+  posts: Post[] = [];
+
   constructor() {
     super();
+
     // Handle forward/back buttons
     window.addEventListener('popstate', this.popstate.bind(this));
     this.addEventListener(HomeRoutes.ViewPost, this.changeView);
@@ -78,6 +97,20 @@ export class MgLayout extends LitElement {
     this.route = MainRoutes.Post;
   }
 
+  stateChanged(state: Map<string, State<unknown>>) {
+    const value: State<PostState> = state?.get(
+      PostActions.slice()
+    ) as State<PostState>;
+    const postState: PostState = value?.state;
+    const entities: Post[] = postState?.entities;
+    this.posts = entities ?? [];
+  }
+
+  protected override firstUpdated(): void {
+    store.dispatch(PostActions.loadPosts());
+    store.dispatch(UserActions.loadUsers());
+  }
+
   override updated() {
     this.routeHistory();
   }
@@ -106,12 +139,12 @@ export class MgLayout extends LitElement {
     const main = routes.find((route: Route) => route.route === currentRoute);
     if (main) {
       const children = main.children;
-      const newRoute = JSON.parse(JSON.stringify(main));
+      const newRoute = cloneObject(main);
       const childRoute = this.view;
       const child = children
         ? children.find((child: Route) => child.route === childRoute)
         : undefined;
-      const newChild = child ? JSON.parse(JSON.stringify(child)) : undefined;
+      const newChild = child ? cloneObject(child) : undefined;
       if (newChild) {
         newChild.path += '/' + this.postId;
       }
@@ -123,10 +156,16 @@ export class MgLayout extends LitElement {
   }
 
   override render() {
+    const posts = JSON.stringify(this.posts);
     const output = when(
       this.route === MainRoutes.Post,
       () => html`<mg-new-post />`,
-      () => html`<mg-home view="${this.view}" postId="${this.postId}" />`
+      () =>
+        html`<mg-home
+          posts=${posts}
+          view="${this.view}"
+          postId="${this.postId}"
+        />`
     );
 
     return html`
