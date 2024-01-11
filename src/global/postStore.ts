@@ -1,7 +1,8 @@
 import {
-  createAction,
   createActionGroup,
   createReducer,
+  emptyPayload,
+  propPayload,
   on,
   EntityState,
   createSideEffect,
@@ -28,26 +29,27 @@ export const initialPostsState: PostState = {
 export const PostActions: ActionsList = createActionGroup(<ActionGroup>{
   slice: 'posts',
   events: {
-    getPosts: createAction('Get Posts'),
-    incrementReaction: createAction<{postEventPayload: PostEventPayload}>(
+    getPosts: emptyPayload('Get Posts'),
+    incrementReaction: propPayload<{postEventPayload: PostEventPayload}>(
       'Increment Reaction'
     ),
-    deletePost: createAction<{postEventPayload: PostEventPayload}>(
+    deletePost: propPayload<{postEventPayload: PostEventPayload}>(
       'Delete Post'
     ),
-    deletePostSuccess: createAction<{post: Post}>('Delete Post Success'),
-    deletePostFailure: createAction<{error: Error}>('Delete Post Failure'),
-    loadPosts: createAction('Load Posts'),
-    loadPostsSuccess: createAction<{posts: Post[]}>('Load Posts Success'),
-    loadPostsFailure: createAction<{error: Error}>('Load Posts Failure'),
-    savePost: createAction<{postEventPayload: PostEventPayload}>('Save Post'),
-    savePostSuccess: createAction<{post: Post}>('Save Post Success'),
-    savePostFailure: createAction<{error: Error}>('Save Post Failure'),
-    updatePost: createAction<{postEventPayload: PostEventPayload}>(
+    deletePostSuccess: propPayload<{post: Post}>('Delete Post Success'),
+    deletePostFailure: propPayload<{error: Error}>('Delete Post Failure'),
+    loadPosts: emptyPayload('Load Posts'),
+
+    loadPostsSuccess: propPayload<{posts: Post[]}>('Load Posts Success'),
+    loadPostsFailure: propPayload<{error: Error}>('Load Posts Failure'),
+    savePost: propPayload<{postEventPayload: PostEventPayload}>('Save Post'),
+    savePostSuccess: propPayload<{post: Post}>('Save Post Success'),
+    savePostFailure: propPayload<{error: Error}>('Save Post Failure'),
+    updatePost: propPayload<{postEventPayload: PostEventPayload}>(
       'Update Post'
     ),
-    updatePostSuccess: createAction<{post: Post}>('Update Post Success'),
-    updatePostFailure: createAction<{error: Error}>('Update Post Failure'),
+    updatePostSuccess: propPayload<{post: Post}>('Update Post Success'),
+    updatePostFailure: propPayload<{error: Error}>('Update Post Failure'),
   },
 });
 

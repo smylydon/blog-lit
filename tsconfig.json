@@ -45,7 +45,8 @@
     "skipLibCheck": true,
     "noImplicitAny": false,
     "outDir": "dist",
-    "importHelpers": true
+    "importHelpers": true,
+    "esModuleInterop": true
   },
   "include": ["**/*.ts"],
   "exclude": []

@@ -1,7 +1,8 @@
 import {
-  createAction,
   createActionGroup,
   createReducer,
+  emptyPayload,
+  propPayload,
   on,
   EntityState,
   createSideEffect,
@@ -29,10 +30,10 @@ export const initialUsersState: UserState = {
 export const UserActions: ActionsList = createActionGroup(<ActionGroup>{
   slice: 'users',
   events: {
-    getUsers: createAction('Get Users'),
-    loadUsers: createAction('Load Users'),
-    loadUsersSuccess: createAction<{users: UserEntity[]}>('Load Users Success'),
-    loadUsersFailure: createAction<{error: Error}>('Load Users Failure'),
+    getUsers: emptyPayload('Get Users'),
+    loadUsers: emptyPayload('Load Users'),
+    loadUsersSuccess: propPayload<{users: UserEntity[]}>('Load Users Success'),
+    loadUsersFailure: propPayload<{error: Error}>('Load Users Failure'),
   },
 });
 
