@@ -8,6 +8,7 @@ import {
   createReducer,
   on,
   Clause,
+  State,
 } from './state';
 
 const GET_MY_FIRST_ACTION = 'Get My First Action';
@@ -47,7 +48,8 @@ describe('createActionGroup', () => {
   });
 
   describe('createReducer', () => {
-    let myReducer;
+    const initialState = 'initialState';
+    let myReducer: State<string>;
     let firstTransform;
     let secondTransform;
     let firstOnClause: Clause;
@@ -60,17 +62,42 @@ describe('createActionGroup', () => {
       firstOnClause = on(myActions.getMyFirstAction, firstTransform);
       secondOnClause = on(myActions.getMySecondAction, secondTransform);
 
-      myReducer = createReducer(firstOnClause, secondOnClause);
+      myReducer = createReducer<string>(
+        initialState,
+        firstOnClause,
+        secondOnClause
+      );
     });
 
-    it('should create an ActionFunctionf or each "on" function', () => {
+    it('should create an initial reducer.', () => {
+      expect(myReducer.state).toEqual(initialState);
+      expect(myReducer.clauses).toBeDefined();
+      expect(
+        myReducer.clauses[myActions.getMyFirstAction().type]
+      ).toBeDefined();
+      expect(
+        myReducer.clauses[myActions.getMySecondAction().type]
+      ).toBeDefined();
+    });
+
+    it('should create an ActionFunction for each "on" function', () => {
       expect(firstOnClause.type).toContain(GET_MY_FIRST_ACTION_TYPE);
       expect(secondOnClause.type).toContain(GET_MY_SECOND_ACTION_TYPE);
+      expect(myActions.getMyFirstAction().type).toEqual(firstOnClause.type);
+      expect(myActions.getMySecondAction().type).toEqual(secondOnClause.type);
     });
 
-    it('should return the correct state from transform', () => {
+    it('should return the correct state from transform in each "on" clause', () => {
       expect(firstOnClause.result(1, 2)).toContain('firstTransform');
       expect(secondOnClause.result(1, 2)).toContain('secondTransform');
+    });
+
+    it('should return the correct state for each reducer clause', () => {
+      const clauseOne = myReducer.clauses[firstOnClause.type];
+      const clauseTwo = myReducer.clauses[secondOnClause.type];
+
+      expect(clauseOne(1, 2)).toContain('firstTransform');
+      expect(clauseTwo(1, 2)).toContain('secondTransform');
     });
   });
 });
