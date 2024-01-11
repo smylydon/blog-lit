@@ -1,7 +1,7 @@
 import {LitElement} from 'lit';
 
 /* eslint-disable  @typescript-eslint/no-explicit-any */
-type ActionFunction = <T>(a: T, ...rest: unknown[]) => T;
+export type ActionFunction = <T>(a: T, ...rest: unknown[]) => T;
 
 export interface Clause {
   type: string;
@@ -35,10 +35,16 @@ export interface ActionsList {
   [propName: string]: (...any) => any;
 }
 
-const removeSpaces = (s: string) => s.replace(/\s+/, '');
+const removeSpaces = (s: string) => s.replace(/\s+/g, '');
 const getDateString = () => '' + new Date().getTime();
 
-class Action {
+export interface Action {
+  type: string;
+  slice: string;
+  payload?: any;
+}
+
+class ActionType implements Action {
   type: string;
   slice: string;
   payload: any;
@@ -68,10 +74,20 @@ export function createActionGroup(group: ActionGroup): ActionsList {
   return output as ActionsList;
 }
 
-export function createAction<T>(type: string) {
+export function emptyPayload(type: string) {
   return function (slice: string) {
-    return (prop?: T) => {
-      const action = new Action(removeSpaces(type), prop);
+    return () => {
+      const action = new ActionType(removeSpaces(type));
+      action.slice = slice;
+      return action;
+    };
+  };
+}
+
+export function propPayload<T>(type: string) {
+  return function (slice: string) {
+    return (prop: T) => {
+      const action = new ActionType(removeSpaces(type), prop);
       action.slice = slice;
       return action;
     };
