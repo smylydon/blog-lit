@@ -102,6 +102,21 @@ export const postReducer = createReducer<PostState>(
   }),
   on(PostActions.savePostFailure, (state, {error}) =>
     setState(state, true, error)
+  ),
+  on(PostActions.updatePostSuccess, (state, action) => {
+    const post: Post = action.payload;
+    const postId = post.id;
+    const index = state.entities.findIndex((post: Post) => post.id === postId);
+    state.entities = [...state.entities];
+
+    if (index >= 0) {
+      state.entities[index] = post;
+    }
+
+    return setState(state, true, null);
+  }),
+  on(PostActions.updatePostFailure, (state, {error}) =>
+    setState(state, true, error)
   )
 );
 
@@ -125,6 +140,14 @@ export const postEffects = createSideEffect(
     const newPost: NewPost = postEventPayload.post;
     apiService.savePost(newPost).then((post: Post) => {
       const result = PostActions.savePostSuccess(post);
+      dispatcher.dispatch(result);
+    });
+  }),
+  on(PostActions.updatePost, (action, dispatcher) => {
+    const postEventPayload: PostEventPayload = action.payload;
+    const post: Post = postEventPayload.post as Post;
+    apiService.updatePost(post).then((updatedPost: Post) => {
+      const result = PostActions.updatePostSuccess(updatedPost);
       dispatcher.dispatch(result);
     });
   })

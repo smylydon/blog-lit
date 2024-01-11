@@ -53,11 +53,11 @@ export default class ApiService {
         return response.json();
       })
       .then((data: PostEntity) => {
-        const postEntity: PostEntity = {
+        const updatedPost: Post = {
           ...post,
           id: data.id,
         };
-        return this.convertPostEntityToPost(postEntity);
+        return updatedPost;
       });
   }
 

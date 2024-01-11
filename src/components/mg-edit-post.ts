@@ -6,6 +6,7 @@ import styles from './mg-new-post.scss';
 import {
   Post,
   PostEvent,
+  NewPost,
   store,
   StoreInterface,
   StoreListenerInterface,
@@ -14,6 +15,7 @@ import {
   UserEntity,
   getUsersFromStore,
   getSelectorValues,
+  cloneObject,
 } from '../global';
 
 import {Form, FormEvent, FormItem, ValidatorType} from '../global/form';
@@ -104,19 +106,42 @@ export class MgEditPost
     }
   }
 
-  _clickDeletePost(event: Event) {
-    event.stopImmediatePropagation();
-
+  sendEvent(type, post: Post) {
     this.dispatchEvent(
-      new CustomEvent(PostEvent.DeletePost, {
+      new CustomEvent(type, {
         detail: {
-          postId: this.model.id,
-          post: this.model,
+          postId: post.id,
+          post,
         },
         bubbles: true,
         composed: true,
       })
     );
+  }
+
+  _clickDeletePost(event: Event) {
+    event.stopImmediatePropagation();
+
+    this.sendEvent(PostEvent.DeletePost, this.model);
+  }
+
+  _clickSavePost(event: Event) {
+    event.stopImmediatePropagation();
+    const formItems: Map<string, FormItem> = new Map();
+    this.form.formItems.forEach((formItem: FormItem) => {
+      formItems.set(formItem.name, formItem);
+    });
+
+    const postTitle = formItems.get('postTitle');
+    const postAuthor = formItems.get('postAuthor');
+    const postContent = formItems.get('postContent');
+    const post: Post = cloneObject(this.model);
+
+    post.title = <string>postTitle?.value;
+    post.userId = Number(postAuthor?.value);
+    post.body = <string>postContent?.value;
+
+    this.sendEvent(PostEvent.UpdatePost, post);
   }
 
   override render() {
@@ -128,7 +153,10 @@ export class MgEditPost
     const values = JSON.stringify(items);
     const button = when(
       this.form.valid,
-      () => html` <button type="button">Save Post</button>`,
+      () =>
+        html` <button type="button" @click=${this._clickSavePost}>
+          Save Post
+        </button>`,
       () => html` <button type="button" disabled>Save Post</button>`
     );
 
