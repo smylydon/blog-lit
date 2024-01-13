@@ -35,8 +35,8 @@ export interface ActionsList {
   [propName: string]: (...any) => any;
 }
 
-const removeSpaces = (s: string) => s.replace(/\s+/g, '');
-const getDateString = () => '' + new Date().getTime();
+export const removeSpaces = (s: string) => s.replace(/\s+/g, '');
+export const getTimeString = () => '' + new Date().getTime();
 
 export interface Action {
   type: string;
@@ -59,7 +59,7 @@ export function createActionGroup(group: ActionGroup): ActionsList {
   const output = {};
   const events = group.events;
   let slice = typeof group['slice'] === 'string' ? group['slice'] : '';
-  slice = removeSpaces(slice) + getDateString();
+  slice = removeSpaces(slice) + getTimeString();
   group['slice'] = slice;
   for (const key in events) {
     if (events.hasOwnProperty(key)) {
@@ -98,12 +98,17 @@ export function on(key: () => Action, func: (a, ...rest) => unknown): Clause {
   return {type: key().type, result: func as ActionFunction};
 }
 
-export function createReducer<T>(initialState: T, ...rest): State<T> {
-  const clauses = rest.reduce((clauses, item) => {
+export const createClauses = (rest) => {
+  return (Array.isArray(rest) ? rest : []).reduce((clauses, item) => {
     const type = removeSpaces(item.type);
     clauses[type] = item.result;
     return clauses;
   }, {});
+};
+
+export function createReducer<T>(initialState: T, ...rest): State<T> {
+  const clauses = createClauses(rest);
+
   return <State<T>>{
     state: initialState,
     clauses,
@@ -111,11 +116,7 @@ export function createReducer<T>(initialState: T, ...rest): State<T> {
 }
 
 export function createSideEffect(...rest): SideEffect {
-  const effects = rest.reduce((sideEffects, item) => {
-    const type = removeSpaces(item.type);
-    sideEffects[type] = item.result;
-    return sideEffects;
-  }, {});
+  const effects = createClauses(rest);
 
   return <SideEffect>{
     effects,
@@ -129,7 +130,7 @@ export class Store implements StoreInterface {
   private listeners: Set<StoreListenerInterface>;
 
   constructor() {
-    this.id += getDateString();
+    this.id += getTimeString();
     this.store = new Map();
     this.sideEffects = new Map();
     this.listeners = new Set();
@@ -149,7 +150,7 @@ export class Store implements StoreInterface {
     store: State<unknown>,
     sideEffects: SideEffect = undefined
   ) {
-    const type = removeSpaces(slice) ?? getDateString();
+    const type = removeSpaces(slice) ?? getTimeString();
     store.name = slice;
     this.store.set(type, store);
     if (sideEffects) {
