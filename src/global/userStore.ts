@@ -12,6 +12,7 @@ import {
 } from './state';
 import {UserEntity} from './user';
 import {apiService} from './api';
+import {setAll, setState} from './entitie';
 
 export interface UserState extends EntityState<UserEntity[]> {
   entities: UserEntity[];
@@ -36,18 +37,6 @@ export const UserActions: ActionsList = createActionGroup(<ActionGroup>{
     loadUsersFailure: propPayload<{error: Error}>('Load Users Failure'),
   },
 });
-
-const setState = (
-  state: UserState,
-  loaded: boolean,
-  error: Error | null = null
-): UserState => {
-  return <UserState>{...state, loaded, error};
-};
-
-function setAll(users: UserEntity[], state: UserState) {
-  return <UserState>Object.assign({}, state, {entities: users});
-}
 
 export const userReducer = createReducer<UserState>(
   initialUsersState,

@@ -11,6 +11,10 @@ import {
   removeSpaces,
   getTimeString,
   State,
+  Store,
+  StoreListenerInterface,
+  StoreInterface,
+  createStore,
 } from './state';
 
 const GET_MY_FIRST_ACTION = ' Get My First Action ';
@@ -28,6 +32,12 @@ describe('state', () => {
 
     it('should create a unix time stamp', () => {
       expect(getTimeString()).toMatch(/\d{12,}/);
+    });
+
+    it('should create a store', () => {
+      const store = createStore();
+      expect(store instanceof Store).toBe(true);
+      expect(store.id).toMatch(/store\d{12,}/);
     });
   });
 
@@ -94,10 +104,10 @@ describe('state', () => {
         expect(myReducer.state).toEqual(initialState);
         expect(myReducer.clauses).toBeDefined();
         expect(
-          myReducer.clauses[myActions.getMyFirstAction().type]
+          myReducer.clauses.get(myActions.getMyFirstAction().type)
         ).toBeDefined();
         expect(
-          myReducer.clauses[myActions.getMySecondAction().type]
+          myReducer.clauses.get(myActions.getMySecondAction().type)
         ).toBeDefined();
       });
 
@@ -114,11 +124,39 @@ describe('state', () => {
       });
 
       it('should return the correct state for each reducer clause', () => {
-        const clauseOne = myReducer.clauses[firstOnClause.type];
-        const clauseTwo = myReducer.clauses[secondOnClause.type];
+        const clauseOne = myReducer.clauses.get(firstOnClause.type);
+        const clauseTwo = myReducer.clauses.get(secondOnClause.type);
 
         expect(clauseOne(1, 2)).toContain('firstTransform');
         expect(clauseTwo(1, 2)).toContain('secondTransform');
+      });
+
+      describe('Store', () => {
+        let store: Store;
+        let component: StoreListenerInterface;
+
+        beforeEach(() => {
+          store = createStore();
+          store.addReducer(myActions.slice(), myReducer);
+
+          class MyTest implements StoreListenerInterface {
+            constructor() {
+              store.register(this);
+            }
+            stateChanged(store: StoreInterface) {
+              return store;
+            }
+          }
+          component = new MyTest();
+        });
+
+        it('should be able to dispatch actions and receive results', () => {
+          const somethingSpy = jest.spyOn(component, 'stateChanged');
+
+          store.dispatch(myActions.getMyFirstAction());
+
+          expect(somethingSpy).toHaveBeenCalled();
+        });
       });
     });
   });

@@ -10,6 +10,7 @@ import {
   ActionsList,
 } from './state';
 import {NewPost, Post, PostEventPayload} from './post';
+import {setAll, setState} from './entitie';
 import {apiService} from './api';
 
 export interface PostState extends EntityState<Post[]> {
@@ -52,18 +53,6 @@ export const PostActions: ActionsList = createActionGroup(<ActionGroup>{
     updatePostFailure: propPayload<{error: Error}>('Update Post Failure'),
   },
 });
-
-const setState = (
-  state: PostState,
-  loaded: boolean,
-  error: Error | null = null
-): PostState => {
-  return <PostState>{...state, loaded, error};
-};
-
-function setAll(posts: Post[], state: PostState) {
-  return <PostState>Object.assign({}, state, {entities: posts});
-}
 
 export const postReducer = createReducer<PostState>(
   initialPostsState,

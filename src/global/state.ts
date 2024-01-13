@@ -1,5 +1,3 @@
-import {LitElement} from 'lit';
-
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 export type ActionFunction = <T>(a: T, ...rest: unknown[]) => T;
 
@@ -11,13 +9,13 @@ export interface Clause {
 export interface State<T> {
   name?: string;
   state: T;
-  clauses: Record<string, ActionFunction>;
+  clauses: Map<string, ActionFunction>;
 }
 
 export interface SideEffect {
   name?: string;
   dispatcher: StoreInterface;
-  effects: Record<string, ActionFunction>;
+  effects: Map<string, ActionFunction>;
 }
 
 export interface EntityState<T> {
@@ -35,14 +33,26 @@ export interface ActionsList {
   [propName: string]: (...any) => any;
 }
 
-export const removeSpaces = (s: string) => s.replace(/\s+/g, '');
-export const getTimeString = () => '' + new Date().getTime();
+export interface StoreInterface {
+  addReducer(slice: string, s: State<unknown>);
+  addSideEffect(slice: string, sideEffects: SideEffect);
+  select<T>(slice: string): T;
+  register(storeListener: StoreListenerInterface);
+  dispatch(action: Action);
+}
+
+export interface StoreListenerInterface {
+  stateChanged(store: StoreInterface);
+}
 
 export interface Action {
   type: string;
   slice: string;
   payload?: any;
 }
+
+export const removeSpaces = (s: string) => s.replace(/\s+/g, '');
+export const getTimeString = () => '' + new Date().getTime();
 
 class ActionType implements Action {
   type: string;
@@ -58,16 +68,14 @@ class ActionType implements Action {
 export function createActionGroup(group: ActionGroup): ActionsList {
   const output = {};
   const events = group.events;
-  let slice = typeof group['slice'] === 'string' ? group['slice'] : '';
-  slice = removeSpaces(slice) + getTimeString();
-  group['slice'] = slice;
+  let slice = typeof group.slice === 'string' ? group.slice : '';
+  slice = (removeSpaces(slice) || 'ag') + getTimeString();
+  group.slice = slice;
   for (const key in events) {
-    if (events.hasOwnProperty(key)) {
+    if (key !== 'slice' && events.hasOwnProperty(key)) {
       const value = events[key];
-      if (key !== 'slice') {
-        const func: () => Action = value(slice);
-        output[key] = func;
-      }
+      const func: () => Action = value(slice);
+      output[key] = func;
     }
   }
   output['slice'] = () => slice;
@@ -98,16 +106,16 @@ export function on(key: () => Action, func: (a, ...rest) => unknown): Clause {
   return {type: key().type, result: func as ActionFunction};
 }
 
-export const createClauses = (rest) => {
+export const createClauses = (rest: Clause[]): Map<string, ActionFunction> => {
   return (Array.isArray(rest) ? rest : []).reduce((clauses, item) => {
-    const type = removeSpaces(item.type);
-    clauses[type] = item.result;
+    const type = item.type;
+    clauses.set(type, item.result);
     return clauses;
-  }, {});
+  }, new Map());
 };
 
 export function createReducer<T>(initialState: T, ...rest): State<T> {
-  const clauses = createClauses(rest);
+  const clauses: Map<string, ActionFunction> = createClauses(rest);
 
   return <State<T>>{
     state: initialState,
@@ -116,7 +124,7 @@ export function createReducer<T>(initialState: T, ...rest): State<T> {
 }
 
 export function createSideEffect(...rest): SideEffect {
-  const effects = createClauses(rest);
+  const effects: Map<string, ActionFunction> = createClauses(rest);
 
   return <SideEffect>{
     effects,
@@ -124,13 +132,13 @@ export function createSideEffect(...rest): SideEffect {
 }
 
 export class Store implements StoreInterface {
-  public id: 'store';
+  public id: string;
   private store: Map<string, State<unknown>>;
   private sideEffects: Map<string, SideEffect>;
   private listeners: Set<StoreListenerInterface>;
 
   constructor() {
-    this.id += getTimeString();
+    this.id = 'store' + getTimeString();
     this.store = new Map();
     this.sideEffects = new Map();
     this.listeners = new Set();
@@ -141,34 +149,38 @@ export class Store implements StoreInterface {
     return state?.state;
   }
 
-  register(x: StoreListenerInterface) {
-    this.listeners.add(x);
+  register(storeListener: StoreListenerInterface) {
+    this.listeners.add(storeListener);
   }
 
-  addReducer(
-    slice: string,
-    store: State<unknown>,
-    sideEffects: SideEffect = undefined
-  ) {
-    const type = removeSpaces(slice) ?? getTimeString();
-    store.name = slice;
-    this.store.set(type, store);
-    if (sideEffects) {
+  checkSliceName(slice: string): boolean {
+    return /\w+\d{12,}/.test(slice) && !/\s+/.test(slice);
+  }
+
+  addReducer(slice: string, store: State<unknown>) {
+    if (this.checkSliceName(slice)) {
+      store.name = slice;
+      this.store.set(slice, store);
+    }
+  }
+
+  addSideEffect(slice: string, sideEffects: SideEffect) {
+    if (this.checkSliceName(slice)) {
       sideEffects.name = slice;
       sideEffects.dispatcher = this;
-      this.sideEffects.set(type, sideEffects);
+      this.sideEffects.set(slice, sideEffects);
     }
   }
 
   dispatch(action: Action) {
     const store: State<unknown> = this.store.get(action.slice);
-    const sideEffects: SideEffect = this.sideEffects.get(action.slice);
+    const sideEffect: SideEffect = this.sideEffects.get(action.slice);
 
     if (store) {
       const currentState = store.state;
       const clauses = store.clauses;
       if (clauses) {
-        const clause = clauses[action.type];
+        const clause = clauses.get(action.type);
         if (clause) {
           const state = clause(currentState, action);
           store.state = state;
@@ -180,49 +192,17 @@ export class Store implements StoreInterface {
       }
     }
 
-    if (sideEffects) {
-      const sideEffect = sideEffects?.effects[action.type];
-      if (sideEffect) {
-        sideEffect(action, this);
+    if (sideEffect) {
+      const effect = sideEffect.effects.get(action.type);
+      if (effect) {
+        effect(action, this);
       }
     }
   }
-}
-
-export interface StoreInterface {
-  addReducer(name: string, s: State<unknown>, sideEffects: SideEffect);
-  select<T>(slice: string): T;
-  register(x: StoreListenerInterface);
-  dispatch(action: Action);
 }
 
 export function createStore() {
   return new Store();
 }
 
-type Constructor<T> = new (...args: any[]) => T;
-
-export interface StoreListenerInterface {
-  stateChanged(store: StoreInterface);
-}
-
-export const connect = function (store: Store) {
-  const Connect = <T extends Constructor<LitElement>>(superClass: T) => {
-    abstract class MgPostBaseElement
-      extends superClass
-      implements StoreListenerInterface
-    {
-      constructor(...a: any[]) {
-        super(a);
-        store.register(this);
-      }
-
-      abstract stateChanged(store: StoreInterface);
-    }
-
-    return MgPostBaseElement as Constructor<StoreListenerInterface> & T;
-  };
-
-  return Connect;
-};
 /* eslint-enable  @typescript-eslint/no-explicit-any */

@@ -1,5 +1,6 @@
 export * from './api';
 export * from './form';
+export * from './connect';
 export * from './post';
 export * from './postStore';
 export * from './routes';
