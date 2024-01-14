@@ -10,7 +10,7 @@ import {
   ActionsList,
 } from './state';
 import {NewPost, Post, PostEventPayload} from './post';
-import {setAll, setState} from './entitie';
+import {setAll, setState} from './entity';
 import {apiService} from './api';
 
 export interface PostState extends EntityState<Post[]> {

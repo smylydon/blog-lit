@@ -12,7 +12,7 @@ import {
 } from './state';
 import {UserEntity} from './user';
 import {apiService} from './api';
-import {setAll, setState} from './entitie';
+import {setAll, setState} from './entity';
 
 export interface UserState extends EntityState<UserEntity[]> {
   entities: UserEntity[];

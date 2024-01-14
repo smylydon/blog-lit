@@ -3,20 +3,20 @@
  * Copyright 2021 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-
-import {MgBlog} from '../mg-blog.js';
+import {MgLayout} from '../index';
+import {MgBlog} from '../index';
 
 import {fixture, assert} from '@open-wc/testing';
 import {html} from 'lit/static-html.js';
 
-suite('mg-blog', () => {
-  test('is defined', () => {
+describe('mg-blog', () => {
+  it('is defined', () => {
     const el = document.createElement('mg-blog');
-    assert.instanceOf(el, MgBlog);
+    assert.instanceOf(el, MgLayout);
   });
 
-  test('renders with default values', async () => {
-    const el = await fixture(html`<mg-blog></mg-blog>`);
+  it('renders with default values', async () => {
+    const el = await fixture(html`<mg-layout></mg-layout>`);
     assert.shadowDom.equal(
       el,
       `
@@ -27,7 +27,7 @@ suite('mg-blog', () => {
     );
   });
 
-  test('renders with a set name', async () => {
+  it('renders with a set name', async () => {
     const el = await fixture(html`<mg-blog name="Test"></mg-blog>`);
     assert.shadowDom.equal(
       el,
@@ -39,8 +39,8 @@ suite('mg-blog', () => {
     );
   });
 
-  test('handles a click', async () => {
-    const el = (await fixture(html`<mg-blog></mg-blog>`)) as MgBlog;
+  it('handles a click', async () => {
+    const el = (await fixture(html`<mg-blog></mg-blog>`)) as MgLayout;
     const button = el.shadowRoot!.querySelector('button')!;
     button.click();
     await el.updateComplete;
@@ -54,7 +54,7 @@ suite('mg-blog', () => {
     );
   });
 
-  test('styling applied', async () => {
+  it('styling applied', async () => {
     const el = (await fixture(html`<mg-blog></mg-blog>`)) as MgBlog;
     await el.updateComplete;
     assert.equal(getComputedStyle(el).paddingTop, '16px');
