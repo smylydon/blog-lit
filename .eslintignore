@@ -1,7 +1,12 @@
 node_modules/*
 dist/*
+coverage/*
 docs/*
 docs-src/*
 rollup-config.js
+rollup-config.prod.js
+rollup-config.test.js
 custom-elements.json
 web-dev-server.config.js
+web-test-runner.config.js
+
